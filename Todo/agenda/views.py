@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 
 
 
@@ -25,9 +26,24 @@ def login_view(request):
 
   # Handle post requests.
   if (request.method == "POST"):
+
+    # Extract the form data.
+    username = request.POST['username_field']
+    password = request.POST['password_field']
     
     # Attempt to authenticate the user.
-    user = authenticate(username=request.POST.get("username_field"), password=request.POST.get("password_field"))
+    try:
+
+      # Find the user with the same username.
+      user = User.objects.get(username=username)
+
+    except (User.DoesNotExist):
+
+      # Ensure that the user is of type 'None'.
+      user = None
+
+      # Set the error message.
+      error_message = "Username is incorrect."
 
     # Login the user if the authentication was a success.
     if user:
@@ -48,8 +64,54 @@ def login_view(request):
 def register_view(request):
   '''Handles the register requests.'''
 
+  # Declare variables.
+  error_message = None
+
   # Handle post requests.
   if (request.method == "POST"):
-    pass
+    
+    # Extract the data from the form.
+    username = request.POST['username_field']
+    email = request.POST['email_field']
+    password = request.POST['password_field']
+    password_confirmation = request.POST['confirm_field']
 
-  return render(request, "agenda/register.html")
+    # Ensure that each of the fields are not null.
+    if (not username.strip() or not email.strip() or not password.strip()):
+
+      # Set the error message.
+      error_message = "Requires username, email, and password."
+
+    elif (password != password_confirmation):
+
+      # Set the error message.
+      error_message = "Passwords do not match."
+
+    else:
+
+      # Ensure that the username has not already been used.
+      try:
+
+        # Attempt to find a user with the same username.
+        user = User.objects.get(username=username)
+
+      except (User.DoesNotExist):
+
+        # Create the user.
+        user = User(email=email, username=username, password=password)
+
+        # Save the user.
+        user.save()
+
+        # Log the user in.
+        login(request, user)
+
+        # Redirect the user to the home page.
+        return redirect("home")
+
+      else:
+
+        # Set the error message.
+        error_message = "Username is already in use."
+
+  return render(request, "agenda/register.html", {'error_message': error_message})

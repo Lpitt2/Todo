@@ -6,6 +6,9 @@
   </head>
   <body>
     <h1>Register Page</h1>
+    {% if error_message %}
+    <div>{{ error_message }}</div>
+    {% endif %}
     <form onaction="{% url 'register' %}" method="POST">
       {% csrf_token %}
 
