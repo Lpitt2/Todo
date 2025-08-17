@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from .models import *
 
 
@@ -134,3 +135,46 @@ def register_view(request):
         error_message = "Username is already in use."
 
   return render(request, "agenda/register.html", {'error_message': error_message})
+
+
+@login_required(login_url="/login")
+def task_view(request):
+  return render(request, "agenda/task.html")
+
+
+def task_info(request, task_id):
+  '''Returns the information of the specified task.'''
+
+  # Ensure that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+  
+  # Handle the request.
+
+
+def task_edit(request, task_id):
+  '''Handle API requests for task data.'''
+
+  # Ensure that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+
+  # Ensure that the request method is of type put.
+  if (request.method != 'PUT'):
+    return HttpResponse(status=403)
+  
+  # Handle the request.
+
+
+def task_new(request):
+  '''Handles the new task view.'''
+
+  # Ensure that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+
+  # Ensure that the request type is put.
+  if (request.method != "PUT"):
+    return HttpResponse(status=403)
+    
+  # Handle the request.
