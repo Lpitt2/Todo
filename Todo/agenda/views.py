@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from .models import *
 
 
 
@@ -15,7 +16,25 @@ def index_view(request):
 def home_view(request):
   '''Handles the home view.'''
 
-  return render(request, "agenda/home.html")
+  # Extract the user.
+  user = request.user
+
+  # Declare tasks dictionary.
+  tasks = dict()
+
+  # Iterate over the tasks owned by the 
+  for task in user.task_set.all():
+
+    # Determine if the task group exists yet.
+    if task.group not in tasks:
+
+      # Add a key for the group.
+      tasks[task.group] = list()
+
+    # Append the current task to the group.
+    tasks[task.group].append(task)
+
+  return render(request, "agenda/home.html", {'tasks': tasks})
 
 
 def login_view(request):
