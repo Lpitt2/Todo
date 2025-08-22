@@ -1,10 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import *
 
+
+# Page Requests.
 
 
 def index_view(request):
@@ -142,39 +145,57 @@ def task_view(request):
   return render(request, "agenda/task.html")
 
 
-def task_info(request, task_id):
-  '''Returns the information of the specified task.'''
+# API Requests.
 
-  # Ensure that the user is logged in.
-  if (not request.user.is_authenticated):
+
+@login_required()
+def task_info(request, task_id):
+  '''Responds with information about the requested task.'''
+
+  # Find the requested task.
+  task = get_object_or_404(Task, pk=task_id)
+
+  # Ensure that the task is owned by the user.
+  if (task.owner != request.user):
     return HttpResponse(status=401)
   
-  # Handle the request.
+  # Build the response.
+  data = {
+    'ID': task.id,
+    'title': task.title,
+    'description': task.description,
+    'completed': task.completion_status,
+    'owner': {
+      'ID': None,
+      'username': task.owner.username
+    }
+  }
+
+  return JsonResponse(data)
 
 
+@require_http_methods(['PUT'])
 def task_edit(request, task_id):
   '''Handle API requests for task data.'''
 
   # Ensure that the user is logged in.
   if (not request.user.is_authenticated):
     return HttpResponse(status=401)
-
-  # Ensure that the request method is of type put.
-  if (request.method != 'PUT'):
-    return HttpResponse(status=403)
   
-  # Handle the request.
+  # Attempt to find the task.
+  task = get_object_or_404(Task, pk=task_id)
+
+  # Ensure that the task is owned by the user.
+  if (task.owner != request.user):
+    return HttpResponse(status=401)
 
 
+@require_http_methods(['PUT'])
 def task_new(request):
   '''Handles the new task view.'''
 
   # Ensure that the user is logged in.
   if (not request.user.is_authenticated):
     return HttpResponse(status=401)
-
-  # Ensure that the request type is put.
-  if (request.method != "PUT"):
-    return HttpResponse(status=403)
     
   # Handle the request.
