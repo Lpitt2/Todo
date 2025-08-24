@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 
+{% load static %}
+
 <html lang="en-US">
   <head>
-    <title>Agenda</title>
+    <title>Agenda - Home</title>
+    <script type="text/javascript" src="{% static 'new_task_form.js' %}"></script>
   </head>
   <body>
     <h1>Home Page</h1>
@@ -33,5 +36,37 @@
     <h3>There are no tasks yet.</h3>
 
     {% endfor %}
+
+    <h2>New Task</h2>
+
+    <span id="new-task-alert" style="color: red"></span>
+
+    <!--New Task form-->
+    <form id="new-task-form">
+
+      <!--Title field-->
+      <div>
+
+        <input id="new-task-title-field" type="text" placeholder="Title" required>
+
+      </div>
+
+      <!--Description field-->
+      <div>
+
+        <textarea id="new-task-description-field" rows="20" cols="50"></textarea>
+
+      </div>
+
+      <!--Due Date field-->
+      <div>
+
+        <input id="new-task-due-date-field" type="date">
+
+      </div>
+
+      <input type="submit" value="Create Task">
+
+    </form>
   </body>
 </html>

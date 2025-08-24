@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from .models import *
+from json import JSONDecoder
+from datetime import date
 
 
 # Page Requests.
@@ -14,31 +17,6 @@ def index_view(request):
   '''Renders the landing page.'''
 
   return render(request, "agenda/index.html")
-
-
-@login_required(login_url="/login")
-def home_view(request):
-  '''Handles the home view.'''
-
-  # Extract the user.
-  user = request.user
-
-  # Declare tasks dictionary.
-  tasks = dict()
-
-  # Iterate over the tasks owned by the 
-  for task in user.task_set.all():
-
-    # Determine if the task group exists yet.
-    if task.group not in tasks:
-
-      # Add a key for the group.
-      tasks[task.group] = list()
-
-    # Append the current task to the group.
-    tasks[task.group].append(task)
-
-  return render(request, "agenda/home.html", {'tasks': tasks})
 
 
 def login_view(request):
@@ -141,6 +119,31 @@ def register_view(request):
 
 
 @login_required(login_url="/login")
+def home_view(request):
+  '''Handles the home view.'''
+
+  # Extract the user.
+  user = request.user
+
+  # Declare tasks dictionary.
+  tasks = dict()
+
+  # Iterate over the tasks owned by the 
+  for task in user.task_set.all():
+
+    # Determine if the task group exists yet.
+    if task.group not in tasks:
+
+      # Add a key for the group.
+      tasks[task.group] = list()
+
+    # Append the current task to the group.
+    tasks[task.group].append(task)
+
+  return render(request, "agenda/home.html", {'tasks': tasks})
+
+
+@login_required(login_url="/login")
 def task_view(request):
   return render(request, "agenda/task.html")
 
@@ -191,6 +194,7 @@ def task_edit(request, task_id):
 
 
 @require_http_methods(['PUT'])
+@csrf_exempt
 def task_new(request):
   '''Handles the new task view.'''
 
@@ -198,4 +202,35 @@ def task_new(request):
   if (not request.user.is_authenticated):
     return HttpResponse(status=401)
     
-  # Handle the request.
+  # Create a new task object.
+  task = Task()
+
+  # Create the JSON decoder.
+  decoder = JSONDecoder()
+
+  # Extract the JSON object from the request.
+  data = decoder.decode(request.body.decode("utf-8"))
+
+  # Ensure that the required fields are present.
+  if (("title" not in data) or (data['title'].strip() == "")):
+    return HttpResponse(status=400)
+  
+  # Add the title.
+  task.title = data['title']
+
+  # Add the owner.
+  task.owner = request.user
+
+  # Add the description if present.
+  if ("description" in data):
+    task.description = data['description']
+
+  # Add the due date if present.
+  if (("due_date" in data) and (data['due_date'] != None) and ("year" in data['due_date']) and ("month" in data["due_date"]) and ("day" in data["due_date"])):
+    task.due_date = date(data['due_date']['year'], data['due_date']['month'], data['due_date']['day'])
+
+  # Save the task.
+  task.save()
+
+  # Load the information into the task object.
+  return HttpResponse(status=200)
