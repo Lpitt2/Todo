@@ -12,5 +12,6 @@ urlpatterns = [
   # Task API.
   path("task/info/<int:task_id>", views.task_info, name="task-info"),
   path("task/edit/<int:task_id>", views.task_edit, name="task-edit"),
-  path("task/new", views.task_new, name="task-new")
+  path("task/delete/<int:task_id>", views.task_delete, name="task-delete"),
+  path("task/new", views.task_new, name="task-new"),
 ]

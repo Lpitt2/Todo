@@ -152,7 +152,7 @@ def task_view(request):
 
 
 def task_info(request, task_id):
-  '''Responds with information about the requested task.'''
+  '''API to get task information.'''
 
   # Ensure that the user is logged in.
   if (not request.user.is_authenticated):
@@ -197,7 +197,7 @@ def task_info(request, task_id):
 @require_http_methods(['PUT'])
 @csrf_exempt
 def task_edit(request, task_id):
-  '''Handle API requests for task data.'''
+  '''API to edit tasks.'''
 
   # Ensure that the user is logged in.
   if (not request.user.is_authenticated):
@@ -248,11 +248,30 @@ def task_edit(request, task_id):
   return HttpResponse(status=200)
 
 
+def task_delete(request, task_id):
+  '''API to delete tasks.'''
+
+  # Ensure that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+  
+  # Attempt to obtain the task.
+  task = get_object_or_404(Task, pk=task_id)
+
+  # Ensure that the user is the owner of the object.
+  if (task.owner != request.user):
+    return HttpResponse(status=401)
+  
+  # Delete the task.
+  task.delete()
+
+  return HttpResponse(status=200)
+
 
 @require_http_methods(['PUT'])
 @csrf_exempt
 def task_new(request):
-  '''Handles the new task view.'''
+  '''API to create tasks.'''
 
   # Ensure that the user is logged in.
   if (not request.user.is_authenticated):
