@@ -151,9 +151,12 @@ def task_view(request):
 # API Requests.
 
 
-@login_required()
 def task_info(request, task_id):
   '''Responds with information about the requested task.'''
+
+  # Ensure that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
 
   # Find the requested task.
   task = get_object_or_404(Task, pk=task_id)
@@ -162,12 +165,26 @@ def task_info(request, task_id):
   if (task.owner != request.user):
     return HttpResponse(status=401)
   
+  # Determine if the task is within a group.
+  group_data = None
+  if (task.group != None):
+    group_data = {
+      'groupID': task.group.id,
+      'group_title': task.group.title
+    }
+
   # Build the response.
   data = {
     'ID': task.id,
     'title': task.title,
     'description': task.description,
     'completed': task.completion_status,
+    'due_date': {
+      'year': task.due_date.year,
+      'month': task.due_date.month,
+      'day': task.due_date.day
+    },
+    'group': group_data,
     'owner': {
       'ID': None,
       'username': task.owner.username
@@ -178,6 +195,7 @@ def task_info(request, task_id):
 
 
 @require_http_methods(['PUT'])
+@csrf_exempt
 def task_edit(request, task_id):
   '''Handle API requests for task data.'''
 
@@ -191,6 +209,44 @@ def task_edit(request, task_id):
   # Ensure that the task is owned by the user.
   if (task.owner != request.user):
     return HttpResponse(status=401)
+  
+  # Decode the request.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Update the title if present.
+  if ("title" in data):
+    task.title = data['title']
+  
+  # Update the description if present.
+  if ("description" in data):
+    task.description = data['description']
+
+  # Update the due date if present.
+  if (("due_date" in data) and (data['due_date'] != None) and ("year" in data['due_date']) and ("month" in data["due_date"]) and ("day" in data["due_date"])):
+    task.due_date = date(data['due_date']['year'], data['due_date']['month'], data['due_date']['day'])
+
+  # Update the completion status if present.
+  if ("complete" in data):
+    task.completion_status = data['complete']
+
+  # Update the group if present.
+  if ("group" in data):
+
+    # Find the group.
+    group = get_object_or_404(TaskGroup, pk=data['group'])
+
+    # Ensure that the group is owned by the user.
+    if (group.owner != request.user):
+      return HttpResponse(status=401)
+    
+    # Update the group to the task.
+    task.group = group
+
+  # Save the changes made to the task.
+  task.save()
+
+  return HttpResponse(status=200)
+
 
 
 @require_http_methods(['PUT'])
@@ -205,11 +261,8 @@ def task_new(request):
   # Create a new task object.
   task = Task()
 
-  # Create the JSON decoder.
-  decoder = JSONDecoder()
-
   # Extract the JSON object from the request.
-  data = decoder.decode(request.body.decode("utf-8"))
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
 
   # Ensure that the required fields are present.
   if (("title" not in data) or (data['title'].strip() == "")):
