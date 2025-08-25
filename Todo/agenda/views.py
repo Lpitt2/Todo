@@ -361,6 +361,17 @@ def group_edit(request, group_id):
 def group_delete(request, group_id):
   '''API to delete a group.'''
 
+  # Attempt to get the group object.
+  group = get_object_or_404(TaskGroup, pk=group_id)
+
+  # Ensure that the requesting user is the owner.
+  if (group.owner != request.user):
+    return HttpResponse(status=401)
+  
+  # Delete the group object.
+  group.delete()
+
+  return HttpResponse(status=200)
 
 
 @require_http_methods(['PUT'])
