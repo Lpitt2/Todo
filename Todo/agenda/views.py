@@ -351,17 +351,44 @@ def group_edit(request, group_id):
   # Update the title if present.
   if ("title" in data):
     group.title = data['title']
-    
+
   # Save the updated group.
   group.save()
 
   return HttpResponse(status=200)
 
 
-
 def group_delete(request, group_id):
   '''API to delete a group.'''
 
 
+
+@require_http_methods(['PUT'])
+@csrf_exempt
 def group_new(request):
   '''API to create a group.'''
+
+  # Ensure that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+  
+  # Create a group object.
+  group = TaskGroup()
+
+  # Extract the JSON object from the request.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Ensure that the title is present in the request.
+  if ("title" not in data):
+    return HttpResponse(status=400)
+  
+  # Assign the title to the group.
+  group.title = data['title']
+
+  # Assign the owner to the group.
+  group.owner = request.user
+
+  # Save the group.
+  group.save()
+
+  return HttpResponse(status=200)
