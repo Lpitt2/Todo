@@ -14,4 +14,10 @@ urlpatterns = [
   path("task/edit/<int:task_id>", views.task_edit, name="task-edit"),
   path("task/delete/<int:task_id>", views.task_delete, name="task-delete"),
   path("task/new", views.task_new, name="task-new"),
+
+  # Group API.
+  path("group/info/<int:group_id>", views.group_info, name="group-info"),
+  path("group/edit/<int:group_id>", views.group_edit, name="group-edit"),
+  path("group/delete/<int:group_id>", views.group_delete, name="group-delete"),
+  path("group/new", views.group_new, name="group-new")
 ]

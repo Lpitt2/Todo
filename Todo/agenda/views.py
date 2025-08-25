@@ -14,13 +14,13 @@ from datetime import date
 
 
 def index_view(request):
-  '''Renders the landing page.'''
+  '''Displays the landing page.'''
 
   return render(request, "agenda/index.html")
 
 
 def login_view(request):
-  '''Handles the login requests.'''
+  '''Displays the login page.'''
 
   # Declare variables.
   error_message = None
@@ -58,12 +58,11 @@ def login_view(request):
     else:
       error_message = "Username or password is incorrect."
 
-
   return render(request, "agenda/login.html", {'error_message': error_message})
 
 
 def register_view(request):
-  '''Handles the register requests.'''
+  '''Displays the create new account page.'''
 
   # Declare variables.
   error_message = None
@@ -120,7 +119,7 @@ def register_view(request):
 
 @login_required(login_url="/login")
 def home_view(request):
-  '''Handles the home view.'''
+  '''Displays the user's home page with their tasks and groups.'''
 
   # Extract the user.
   user = request.user
@@ -145,6 +144,7 @@ def home_view(request):
 
 @login_required(login_url="/login")
 def task_view(request):
+  '''Displays the task page to the logged in user.'''
   return render(request, "agenda/task.html")
 
 
@@ -186,7 +186,7 @@ def task_info(request, task_id):
     },
     'group': group_data,
     'owner': {
-      'ID': None,
+      'ID': task.owner.id,
       'username': task.owner.username
     }
   }
@@ -306,3 +306,62 @@ def task_new(request):
 
   # Load the information into the task object.
   return HttpResponse(status=200)
+
+
+# Group API.
+
+
+def group_info(request, group_id):
+  '''API to get group information.'''
+
+  # Attempt to get the group object.
+  group = get_object_or_404(TaskGroup, pk=group_id)
+
+  # Ensure that the requesting user is the owner.
+  if (group.owner != request.user):
+    return HttpResponse(status=404)
+  
+  # Build the group information.
+  data = {
+    'title': group.title,
+    'owner': {
+      'ID': group.owner.id,
+      'username': group.owner.username
+    }
+  }
+
+  return JsonResponse(data)
+
+
+@require_http_methods(['PUT'])
+@csrf_exempt
+def group_edit(request, group_id):
+  '''API to edit group information.'''
+
+  # Attempt to get the group object.
+  group = get_object_or_404(TaskGroup, pk=group_id)
+
+  # Ensure that the group is owned by the requesting user.
+  if (request.user != group.owner):
+    return HttpResponse(status=401)
+  
+  # Extract the JSON object.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Update the title if present.
+  if ("title" in data):
+    group.title = data['title']
+    
+  # Save the updated group.
+  group.save()
+
+  return HttpResponse(status=200)
+
+
+
+def group_delete(request, group_id):
+  '''API to delete a group.'''
+
+
+def group_new(request):
+  '''API to create a group.'''
