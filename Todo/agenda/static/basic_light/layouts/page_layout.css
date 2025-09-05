@@ -1,0 +1,43 @@
+/*
+
+  This file contains the definitions for the page layout.
+
+  The page layout is a webpage layout following the general structure seen in 
+  most other websites. There is a navigation bar on the top followed by the 
+  main content area and a footer situated at the bottom of the page.
+
+*/
+
+.layout-page {
+
+  display: grid;
+
+  grid-template-rows: 50px auto 100px;
+
+}
+
+/* Layout Sections */
+
+.layout-page > .layout-page-header {
+
+  /* Layout location */
+  grid-row-start: 1;
+  grid-row-end: 1;
+
+}
+
+.layout-page > .layout-page-content {
+
+  /* Layout location */
+  grid-row-start: 2;
+  grid-row-end: 2;
+
+}
+
+.layout-page > .layout-page-footer {
+
+  /* Layout location */
+  grid-row-start: 3;
+  grid-row-end: 3;
+
+}

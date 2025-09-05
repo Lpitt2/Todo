@@ -1,18 +1,11 @@
-<!DOCTYPE html>
+{% extends './base/main_page.html' %}
 
-<html lang="en-US">
-  <head>
-    <title>Agenda</title>
-  </head>
-  <body>
-    <h1>Index Page</h1>
-    <ul>
-      <li>
-        <a href="{% url 'login' %}">Login</a>
-      </li>
-      <li>
-        <a href="{% url 'register' %}">Register</a>
-      </li>
-    </ul>
-  </body>
-</html>
+{% block metadata %}{% endblock %}
+
+{% block content %}
+<div class="layout-page-content">  <h1>Index Page</h1>
+
+  <a href="{% url 'login' %}">Log In</a>
+  <a href="{% url 'register' %}">Register</a>
+</div>
+{% endblock %}

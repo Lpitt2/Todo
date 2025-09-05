@@ -1,18 +1,34 @@
 <!DOCTYPE html>
 
+{% load static %}
+
 <html lang="en-US">
   <head>
     <title>Agenda - {% block title %}{% endblock %}</title>
     {% block metadata %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'basic_light.css' %}">
   </head>
-  <body>
+  <body class="layout-page">
 
     <!--Navigation.-->
-    <nav>
+    <nav class="layout-page-header">
 
-      
+      <div class="left-menu">
+
+        
+
+      </div>
+
+      <div class="right-menu">
+        <a href="{% url 'login' %}">Log In</a>
+        <a href="{% url 'register' %}">Register</a>
+      </div>
 
     </nav>
+
+    {% block content %}{% endblock %}
+
+    <div class="layout-page-footer"></div>
 
   </body>
 </html>

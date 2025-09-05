@@ -1,0 +1,57 @@
+/*
+
+  This file contains the defintions for navigation elements.
+
+  The navigation element (nav) is used for providing a menu system for a 
+  website. Navigation elements will be located at the top of the page and 
+  follow a general list structure whereby links flow from left to right. There
+  are some links that exist on the right side; however, most follow the flow 
+  structure.
+
+*/
+
+nav {
+
+  /* Structure */
+  display: flex;
+  flex-direction: row;
+
+  /* Border */
+  border-bottom: 1px solid grey;
+
+}
+
+/* Left Navigation Menu */
+nav > .left-menu {
+
+  display: flex;
+  flex-direction: row;
+
+  flex: 1;
+
+}
+
+.left-menu > * {
+
+  margin-left: 2em;
+  margin-right: 1em;
+
+}
+
+/* Right Navigation Menu */
+
+nav > .right-menu {
+
+  display: flex;
+  flex-direction: row-reverse;
+
+  flex: 1;
+
+}
+
+.right-menu > * {
+
+  margin-left: 1em;
+  margin-right: 2em;
+
+}
