@@ -1,72 +1,80 @@
-<!DOCTYPE html>
+{% extends './base/main_page.html' %}
 
 {% load static %}
 
-<html lang="en-US">
-  <head>
-    <title>Agenda - Home</title>
-    <script type="text/javascript" src="{% static 'new_task_form.js' %}"></script>
-  </head>
-  <body>
-    <h1>Home Page</h1>
-    {% for group, task_list in tasks.items %}
+{% block metadata %}
+  <script type="text/javascript" src="{% static 'new_task_form.js' %}"></script>
+{% endblock %}
+  
+{% block content %}
 
-    <ul>
 
-      <li>
 
-        <b>{% if group %} {{ group.title }} {% else %} Uncategorized {% endif %}</b>
 
-        <ol>
 
-          {% for task in task_list %}
 
-          <li>{{ task.title }}</li>
 
-          {% endfor %}
 
-        </ol>
 
-      </li>
+<h1>Home Page</h1>
+{% for group, task_list in tasks.items %}
 
-    </ul>
+<ul>
 
-    {% empty %}
+  <li>
 
-    <h3>There are no tasks yet.</h3>
+    <b>{% if group %} {{ group.title }} {% else %} Uncategorized {% endif %}</b>
 
-    {% endfor %}
+    <ol>
 
-    <h2>New Task</h2>
+      {% for task in task_list %}
 
-    <span id="new-task-alert" style="color: red"></span>
+      <li>{{ task.title }}</li>
 
-    <!--New Task form-->
-    <form id="new-task-form">
+      {% endfor %}
 
-      <!--Title field-->
-      <div>
+    </ol>
 
-        <input id="new-task-title-field" type="text" placeholder="Title" required>
+  </li>
 
-      </div>
+</ul>
 
-      <!--Description field-->
-      <div>
+{% empty %}
 
-        <textarea id="new-task-description-field" rows="20" cols="50"></textarea>
+<h3>There are no tasks yet.</h3>
 
-      </div>
+{% endfor %}
 
-      <!--Due Date field-->
-      <div>
+<h2>New Task</h2>
 
-        <input id="new-task-due-date-field" type="date">
+<span id="new-task-alert" style="color: red"></span>
 
-      </div>
+<!--New Task form-->
+<form id="new-task-form">
 
-      <input type="submit" value="Create Task">
+  <!--Title field-->
+  <div>
 
-    </form>
-  </body>
-</html>
+    <input id="new-task-title-field" type="text" placeholder="Title" required>
+
+  </div>
+
+  <!--Description field-->
+  <div>
+
+    <textarea id="new-task-description-field" rows="20" cols="50"></textarea>
+
+  </div>
+
+  <!--Due Date field-->
+  <div>
+
+    <input id="new-task-due-date-field" type="date">
+
+  </div>
+
+  <input type="submit" value="Create Task">
+
+</form>
+
+{% endblock %}

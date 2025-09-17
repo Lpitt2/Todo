@@ -1,30 +1,27 @@
-<!DOCTYPE html>
+{% extends './base/form_page.html' %}
 
-<html lang="en-US">
-  <head>
-    <title>Agenda - LogIn</title>
-  </head>
-  <body>
-    <h1>Login Page</h1>
+{% block content %}
+  <form onaction="{% url 'login' %}" method="POST">
+
     {% if error_message %}
     <div>{{error_message}}</div>
     {% endif %}
-    <form onaction="{% url 'login' %}" method="POST">
-      {% csrf_token %}
 
-      <div>
-        <input type="text" name="username_field" placeholder="Username" required>
-      </div>
 
-      <div>
-        <input type="password" name="password_field" placeholder="Password" required>
-      </div>
+    {% csrf_token %}
 
-      <div>
-        <input type="submit" value="LogIn">
-        <a href="{% url 'register' %}">Create New Account</a>
-      </div>
+    <p>
+      <input type="text" name="username_field" placeholder="Username" required>
+    </p>
 
-    </form>
-  </body>
-</html>
+    <p>
+      <input type="password" name="password_field" placeholder="Password" required>
+    </p>
+
+    <p>
+      <input type="submit" value="LogIn">
+      <a href="{% url 'register' %}">Create New Account</a>
+    </p>
+
+  </form>
+{% endblock %}

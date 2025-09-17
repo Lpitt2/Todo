@@ -3,9 +3,18 @@
 {% block metadata %}{% endblock %}
 
 {% block content %}
-<div class="layout-page-content">  <h1>Index Page</h1>
+<div class="layout-body-split">
 
-  <a href="{% url 'login' %}">Log In</a>
-  <a href="{% url 'register' %}">Register</a>
+  <div class="layout-left-body"></div>
+
+  <div class="layout-center-body">
+
+    <h1>Index Page</h1>
+
+    <a href="{% url 'login' %}"><button>Log In</button></a>
+    <a href="{% url 'register' %}">Register</a>
+
+  </div>
+
 </div>
 {% endblock %}

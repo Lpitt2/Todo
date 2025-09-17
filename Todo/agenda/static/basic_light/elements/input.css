@@ -1,0 +1,115 @@
+input[type="text"], input[type="password"], input[type="email"]
+{
+
+  background-color: #eeeeeeff;
+
+  font-size: 16pt;
+
+  display: block;
+  width: 100%;
+
+  border: 1px solid black;
+  border-radius: 6pt;
+
+  text-align: center;
+
+}
+
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+
+  outline: none;
+
+  border: 1px solid #0088eeff;
+
+}
+
+
+
+input[type="submit"] {
+
+  content: "Submit";
+
+  background-color: #0055ffff;
+  border: 1px solid #0055ffff;
+
+  color: #bbbbbbff;
+
+  font-size: 12pt;
+  border-radius: 4pt;
+
+  padding: 4pt;
+
+}
+
+input[type="submit"]:hover {
+
+  background-color: #0033ffff;
+  border: 1px solid #0033ffff;
+
+}
+
+input[type="submit"]:active {
+
+  background-color: #0011ffff;
+  border: 1px solid #0011ffff;
+
+}
+
+
+input[type="reset"] {
+
+  background-color: #0055ffff;
+  border: 1px solid #0055ffff;
+
+  color: #bbbbbbff;
+
+  font-size: 12pt;
+  border-radius: 4pt;
+
+  padding: 4pt;
+
+}
+
+input[type="reset"]:hover {
+
+  background-color: #0033ffff;
+  border: 1px solid #0033ffff;
+
+}
+
+input[type="reset"]:active {
+
+  background-color: #0011ffff;
+  border: 1px solid #0011ffff;
+
+}
+
+
+input[type="button"] {
+
+  background-color: #0055ffff;
+  border: 1px solid #0055ffff;
+
+  color: #bbbbbbff;
+
+  font-size: 12pt;
+  border-radius: 4pt;
+
+  padding: 4pt;
+
+}
+
+input[type="button"]:hover {
+
+  background-color: #0033ffff;
+  border: 1px solid #0033ffff;
+
+}
+
+input[type="button"]:active {
+
+  background-color: #0011ffff;
+  border: 1px solid #0011ffff;
+
+}

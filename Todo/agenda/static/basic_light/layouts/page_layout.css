@@ -1,43 +1,54 @@
-/*
-
-  This file contains the definitions for the page layout.
-
-  The page layout is a webpage layout following the general structure seen in 
-  most other websites. There is a navigation bar on the top followed by the 
-  main content area and a footer situated at the bottom of the page.
-
-*/
-
 .layout-page {
 
+  display: flex;
+  flex-direction: column;
+
+}
+
+.layout-page > .layout-header {
+
+  flex-grow: 0;
+
+}
+
+.layout-page > .layout-body {
+
+  flex-grow: 1;
+
+}
+
+.layout-page > .layout-body > .layout-body-split {
+
   display: grid;
-
-  grid-template-rows: 50px auto 100px;
-
-}
-
-/* Layout Sections */
-
-.layout-page > .layout-page-header {
-
-  /* Layout location */
-  grid-row-start: 1;
-  grid-row-end: 1;
+  grid-template-columns: 1fr 3fr 1fr;
 
 }
 
-.layout-page > .layout-page-content {
 
-  /* Layout location */
-  grid-row-start: 2;
-  grid-row-end: 2;
+.layout-page > .layout-body > .layout-body-split > .layout-left-body {
+
+  grid-column-start: 1;
+  grid-column-end: 1;
 
 }
 
-.layout-page > .layout-page-footer {
+.layout-page > .layout-body > .layout-body-split > .layout-center-body {
 
-  /* Layout location */
-  grid-row-start: 3;
-  grid-row-end: 3;
+  grid-column-start: 2;
+  grid-column-end: 2;
+
+}
+
+.layout-page > .layout-body > .layout-body-split > .layout-right-body {
+
+  grid-column-start: 3;
+  grid-column-end: 3;
+
+}
+
+
+.layout-page > .layout-footer{
+
+  flex-grow: 0;
 
 }

@@ -1,0 +1,301 @@
+button {
+
+  border-radius: 5pt;
+  padding: 5px;
+
+}
+
+.button-large {
+
+  font-size: 12pt;
+  border-radius: 4pt;
+
+  padding: 4pt;
+
+}
+
+.button-medium {
+
+  font-size: 10pt;
+
+  border-radius: 6pt;
+
+}
+
+.button-small {
+
+  font-size: 6pt;
+
+  border-radius: 5pt;
+
+}
+
+
+/* Basic Button Styling.*/
+
+
+.button-primary {
+
+  background-color: #0055ffff;
+  border: 1px solid #0055ffff;
+  
+  color: #ddddddff;
+
+}
+
+.button-primary:hover {
+
+  background-color: #0033ffff;
+  border: 1px solid #0033ffff;
+
+}
+
+.button-primary:active {
+
+  background-color: #0011ffff;
+  border: 1px solid #0011ffff;
+
+}
+
+.button-primary:disabled {
+
+  background-color: #0077ffff;
+  border: 1px solid #0077ffff;
+
+}
+
+
+.button-secondary {
+
+  background-color: slategray;
+  border: 1px solid slategray;
+
+  color: #ddddddff;
+
+}
+
+.button-secondary:hover {
+
+  background-color: #506070ff;
+  border: 1px solid #506070ff;
+
+}
+
+.button-secondary:active {
+
+  background-color: #304050ff;
+  border: 1px solid #304050ff;
+
+}
+
+.button-secondary:disabled {
+
+  background-color: #90a0b0ff;
+  border: 1px solid #90a0b0ff;
+
+}
+
+
+.button-warning {
+
+  background-color: #ee0000ff;
+  border: 1px solid #ee0000ff;
+
+  color: #ddddddff;
+
+}
+
+.button-warning:hover {
+
+  background-color: #cc0000ff;
+  border: 1px solid #cc0000ff;
+
+}
+
+.button-warning:active {
+
+  background-color: #aa0000ff;
+  border: 1px solid #aa0000ff;
+
+}
+
+.button-warning:disabled {
+
+  background-color: #ff2222ff;
+  border: #ff2222ff;
+
+}
+
+.button-accept {
+
+  background-color: #00aa00ff;
+  border: 1px solid #00aa00ff;
+
+  color: #ddddddff;
+
+}
+
+.button-accept:hover {
+
+  background-color: #008800ff;
+  border: 1px solid #008800ff;
+
+}
+
+.button-accept:active {
+
+  background-color: #006600ff;
+  border: 1px solid #006600ff;
+
+}
+
+.button-accept:disabled {
+
+  background-color: #11dd11ff;
+  border: 1px solid #11dd11ff;
+
+}
+
+
+/* Hollow Button Styling. */
+
+
+.button-primary-hollow {
+
+  background-color: #00000000;
+  border: 1px solid #0055ffff;
+
+  color: #0055ffff;
+
+}
+
+.button-primary-hollow:hover {
+
+  background-color: #0055ffff;
+
+  color: #ddddddff;
+
+}
+
+.button-primary-hollow:active {
+
+  background-color: #0033ffff;
+  border: 1px solid #0033ffff;
+
+}
+
+.button-primary-hollow:disabled {
+
+  background-color: #00000000;
+  border: 1px solid #0077ffff;
+
+  color: #0077ffff;
+
+}
+
+
+
+.button-secondary-hollow {
+
+  background-color: #00000000;
+  border: 1px solid slategray;
+
+  color: slategray;
+
+}
+
+.button-secondary-hollow:hover {
+
+  background-color: slategray;
+
+  color: #ddddddff;
+
+}
+
+.button-secondary-hollow:active {
+
+  background-color: #707070ff;
+  border: 1px solid #707070ff;
+
+}
+
+.button-secondary-hollow:disabled {
+
+  background-color: #00000000;
+  border: 1px solid #90a0b0ff;
+
+  color: #90a0b0ff;
+
+}
+
+
+
+.button-warning-hollow {
+
+  background-color: #00000000;
+  border: 1px solid #ee0000ff;
+
+  color: #ee0000ff;
+
+}
+
+.button-warning-hollow:hover {
+
+  background-color: #ee0000ff;
+
+  color: #ddddddff;
+
+}
+
+.button-warning-hollow:active {
+
+  background-color: #cc0000ff;
+
+  border: 1px solid #cc0000ff;
+
+}
+
+.button-warning-hollow:disabled {
+
+  background-color: #00000000;
+  border: 1px solid #ff2222ff;
+
+  color: #ff2222ff;
+
+}
+
+
+
+.button-accept-hollow {
+
+  background-color: #00000000;
+  border: 1px solid #00aa00ff;
+
+  color: #00aa00ff;
+
+}
+
+.button-accept-hollow:hover {
+
+  background-color: #00aa00ff;
+
+  color: #ddddddff;
+
+}
+
+.button-accept-hollow:active {
+
+  background-color: #007700ff;
+
+  border: 1px solid #007700ff;
+
+}
+
+.button-accept-hollow:disabled {
+
+  background-color: #00000000;
+  border: 1px solid #11dd11ff;
+  
+  color: #11dd11ff;
+
+}

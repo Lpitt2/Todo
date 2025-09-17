@@ -1,0 +1,32 @@
+/* Styling for layouts. */
+@import "./layouts/page_layout.css";
+@import "./layouts/form_layout.css";
+
+/* Styling for elements within the page. */
+@import "./elements/navigation.css";
+@import "./elements/button.css";
+@import "./elements/input.css";
+@import "./elements/form.css";
+
+/* Styling for compound elements. */
+@import "./compound/button_groups.css";
+
+
+/* Overall styling. */
+html > body
+{
+
+  position: absolute;
+  inset: 0px 0px 0px 0px;
+  padding: 0px;
+  margin: 0px;
+
+  /* Font and Text */
+  font-family: sans-serif;
+  font-size: 12pt;
+
+  /* Colors */
+  background-color: #dfdfdfff;
+  color: #505050ff;
+
+}

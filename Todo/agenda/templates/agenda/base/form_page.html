@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html lang="en-US">
+  <head>
+    <title></title>
+    <link rel="stylesheet" href="{% static 'basic_light/basic_light.css' %}">
+  </head>
+  <body class="layout-form">
+
+    <div class="layout-center">
+      {% block content %}{% endblock %}
+    </div>
+
+    <div class="layout-footer">
+      {% block footer %}{% endblock %}
+    </div>
+
+  </body>
+</html>
