@@ -1,3 +1,6 @@
 Todo/db.sqlite3
 Todo/agenda/__pycache__/*
 Todo/Todo/__pycache__/*
+
+./env/*
+./env

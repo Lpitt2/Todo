@@ -12,6 +12,8 @@ edit, and delete groups. A REST API was provided to allow for the development of
 a single page application and a potential mobile app project. Please see the 
 **Design Considerations** section of this document for more information.
 
+---
+
 ### Launch
 
 Before starting the web server, you will need to ensure that you have all of the 
@@ -19,17 +21,26 @@ dependencies listed below:
 
 * Python3
 * Django
+* Channels
+* Redis
+* channels_redis
+* Docker (Used for Redis server)
+* daphne
 
 This project was written using a Linux operating system and as such, there may 
 be problems running it on Windows or macOS (specifically when considering the file
 line endings).
 
-To launch the server ensure that your terminal is in *./Todo/Todo/* and run the 
-command:
+To launch the server, first launch the redis server using the following command:
+
+`$ docker run --rm -p 6397:6397 redis:7`
+
+Once the Redis server is running, ensure that your terminal is in _./Todo/Todo/_ and 
+run the command:
 
 `$ python3 manage.py runserver`
 
-NOte that in some terminals enviornments it is required to specify file names prefixed
+Note that in some terminals enviornments it is required to specify file names prefixed
 with the local path (e.g., "*.\manage.py*"). If there are problems running the program 
 ensure that the migrations are updated by running the commands:
 
@@ -38,6 +49,8 @@ ensure that the migrations are updated by running the commands:
 and
 
 `$ python3 manage.py migrate`
+
+---
 
 ### Design Considerations
 
@@ -98,3 +111,28 @@ The REST API is summerized below:
     <td>Returns a list of all of the group IDs of the user.</td>
   </tr>
 </table>
+
+Additionally, the webserver makes use of websockets as a means to keep the UI consistent 
+when the user is logged in on multiple computers as well as to facilitate the collaborative
+features. The Websocket implementation was designed to incorperate the REST API. Some of the 
+API's methods are not called in this project but left to allow for extending the application
+at a later date. There are two consumers (websocket classes) that are used. The first is 
+called __UserConsumer__ and it ensures that multiple sessions for the same user are up-to-date
+and consistent. The second consumer is called __GroupConsumer__ and it manages the multi-user
+groups that facilitate the collaborative features.
+
+The __UserConsumer__ connects all sessions for the same user together and ensures that they 
+are updated to be in sync with each other. When a user visits a page with volitile data (
+information that can be updated at a moment's notice) then they connect to the websocket server
+and are assigned to a group for their user only. If the user updates information the websocket
+will send the update notice to all other user sessions under the same account to check for updates.
+
+---
+
+### Styling
+
+The CSS code was written for this project and takes inspiration from Bootstrap. The CSS 
+styling includes styling for HTML elements, as well as compound elements and page layout.
+Compound elements are those that are comprised of HTML elements (e.g., button groups). Any
+additional scripting needed for them will be implemented in JavaScript files located in the
+_/static/basic_light/compound/_ folder.
