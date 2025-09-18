@@ -56,4 +56,6 @@ function handle_new_task_submission(e) {
   // Prevent the form from submitting and re-rendering the page.
   e.preventDefault();
 
+  document.getElementById("new-task-dialog").close();
+
 }

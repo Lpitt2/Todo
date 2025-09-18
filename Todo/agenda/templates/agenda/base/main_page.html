@@ -20,7 +20,7 @@
       <li><a href="{% url 'index' %}"><h3 style="margin: 3px; padding: 3px;">Agenda</h3></a></li>
 
       {% if user.is_authenticated %}
-      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'home' %}"><button class="button-primary">Home</button></a></li>
       {% endif %}
 
     </ul>

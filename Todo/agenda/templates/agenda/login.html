@@ -18,9 +18,13 @@
       <input type="password" name="password_field" placeholder="Password" required>
     </p>
 
-    <p>
-      <input type="submit" value="LogIn">
-      <a href="{% url 'register' %}">Create New Account</a>
+    <p class="center-horizontal">
+      <span style="margin-right: 4pt;">
+        <input type="submit" value="LogIn">
+      </span>
+      <span style="margin-left: 4pt;">
+        <a href="{% url 'register' %}">Create New Account</a>
+      </span>
     </p>
 
   </form>

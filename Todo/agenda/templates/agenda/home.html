@@ -4,19 +4,13 @@
 
 {% block metadata %}
   <script type="text/javascript" src="{% static 'new_task_form.js' %}"></script>
+  <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
 {% endblock %}
   
 {% block content %}
 
+<button class="open-dialog-button button-primary" data-target="new-task-dialog">New Task</button>
 
-
-
-
-
-
-
-
-<h1>Home Page</h1>
 {% for group, task_list in tasks.items %}
 
 <ul>
@@ -45,36 +39,38 @@
 
 {% endfor %}
 
-<h2>New Task</h2>
-
-<span id="new-task-alert" style="color: red"></span>
-
 <!--New Task form-->
-<form id="new-task-form">
+<dialog closedBy="any" id="new-task-dialog">
+    
+  <span id="new-task-alert" style="color: red"></span>
 
-  <!--Title field-->
-  <div>
+  <form id="new-task-form">
 
-    <input id="new-task-title-field" type="text" placeholder="Title" required>
+    <!--Title field-->
+    <div>
 
-  </div>
+      <input id="new-task-title-field" type="text" placeholder="Title" required>
 
-  <!--Description field-->
-  <div>
+    </div>
 
-    <textarea id="new-task-description-field" rows="20" cols="50"></textarea>
+    <!--Description field-->
+    <div>
 
-  </div>
+      <textarea id="new-task-description-field" rows="20" cols="50"></textarea>
 
-  <!--Due Date field-->
-  <div>
+    </div>
 
-    <input id="new-task-due-date-field" type="date">
+    <!--Due Date field-->
+    <div>
 
-  </div>
+      <input id="new-task-due-date-field" type="date">
 
-  <input type="submit" value="Create Task">
+    </div>
 
-</form>
+    <button class="button-accept">Create Task</button>
+
+  </form>
+
+</dialog>
 
 {% endblock %}

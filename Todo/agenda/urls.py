@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from . import consumers
 
 urlpatterns = [
   path("", views.index_view, name="index"),
@@ -20,4 +21,9 @@ urlpatterns = [
   path("group/edit/<int:group_id>", views.group_edit, name="group-edit"),
   path("group/delete/<int:group_id>", views.group_delete, name="group-delete"),
   path("group/new", views.group_new, name="group-new")
+]
+
+
+websocket_urls = [
+  path('sockets/user', consumers.UserConsumer.as_asgi())
 ]
