@@ -8,6 +8,11 @@ from django.http import HttpResponse, JsonResponse
 from .models import *
 from json import JSONDecoder
 from datetime import date
+from .users import UserRegistration
+
+
+# Declare the necessary singletons.
+registration = UserRegistration()
 
 
 # Page Requests.
@@ -51,6 +56,9 @@ def login_view(request):
 
       # Log the user in.
       login(request, user)
+
+      # Register the user with the users system.
+      registration.register_user(user)
 
       # Redirect the user to the home.
       return redirect("home")
@@ -106,6 +114,9 @@ def register_view(request):
         # Log the user in.
         login(request, user)
 
+        # Register the user.
+        registration.register_user(user)
+
         # Redirect the user to the home page.
         return redirect("home")
 
@@ -127,6 +138,9 @@ def home_view(request):
   # Declare tasks dictionary.
   tasks = dict()
 
+  # Ensure that the user is registered.
+  token = registration.register_user(request.user)
+
   # Iterate over the tasks owned by the 
   for task in user.task_set.all():
 
@@ -139,7 +153,7 @@ def home_view(request):
     # Append the current task to the group.
     tasks[task.group].append(task)
 
-  return render(request, "agenda/home.html", {'tasks': tasks})
+  return render(request, "agenda/home.html", {'tasks': tasks, 'user_token': token})
 
 
 @login_required(login_url="/login")

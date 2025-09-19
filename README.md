@@ -33,7 +33,7 @@ line endings).
 
 To launch the server, first launch the redis server using the following command:
 
-`$ docker run --rm -p 6397:6397 redis:7`
+`$ docker run --rm -p 6379:6379 redis:7`
 
 Once the Redis server is running, ensure that your terminal is in _./Todo/Todo/_ and 
 run the command:
