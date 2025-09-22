@@ -165,6 +165,52 @@ def task_view(request):
 # API Requests.
 
 
+def user_group_info(request):
+  '''API that returns the user's group information.'''
+
+  # Verify that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+
+  # Obtain the group information.
+  groups = TaskGroup.objects.filter(owner=request.user)
+
+  data = {
+    'groups': [
+      {
+        'title': group.title,
+        'id': group.id
+      } for group in groups
+    ]
+  }
+
+  return JsonResponse(data)
+
+
+def user_task_info(request, user_token):
+  '''API that returns the user's task information.'''
+
+  # Verify that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+
+  # Obtains the task information.
+  tasks = Task.objects.filter(owner=request.user)
+
+  data = {
+    'tasks': [
+      {
+      'title': task.title,
+      'group_id': (task.group.id if task.group != None else None),
+      'completed': task.completion_status,
+      'id': task.id,
+      } for task in tasks
+    ] 
+  }
+
+  return JsonResponse(data)
+
+
 def task_info(request, task_id):
   '''API to get task information.'''
 
@@ -189,7 +235,7 @@ def task_info(request, task_id):
 
   # Build the response.
   data = {
-    'ID': task.id,
+    'id': task.id,
     'title': task.title,
     'description': task.description,
     'completed': task.completion_status,
@@ -341,7 +387,14 @@ def group_info(request, group_id):
     'owner': {
       'ID': group.owner.id,
       'username': group.owner.username
-    }
+    },
+    'tasks': [
+      {
+        'id': task.id,
+        'title': task.title,
+        'completed': task.completion_status
+      } for task in Task.objects.filter(group=group_id)
+    ]
   }
 
   return JsonResponse(data)

@@ -73,7 +73,6 @@ class UserConsumer(WebsocketConsumer):
       }))
 
     
-  
   def handle_creation(self, data):
     '''Handles creation requests'''
     print("user created object.")

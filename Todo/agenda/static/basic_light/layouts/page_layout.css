@@ -15,12 +15,16 @@
 
   flex-grow: 1;
 
+  height: 100%;
+
 }
 
 .layout-page > .layout-body > .layout-body-split {
 
   display: grid;
   grid-template-columns: 1fr 3fr 1fr;
+
+  height: 100%;
 
 }
 
@@ -42,6 +46,20 @@
 .layout-page > .layout-body > .layout-body-split > .layout-right-body {
 
   grid-column-start: 3;
+  grid-column-end: 3;
+
+}
+
+.layout-page > .layout-body > .layout-body-split > .layout-center-right {
+
+  grid-column-start: 2;
+  grid-column-end: 4;
+
+}
+
+.layout-page > .layout-body > .layout-body-split > .layout-center-left {
+
+  grid-column-start: 1;
   grid-column-end: 3;
 
 }

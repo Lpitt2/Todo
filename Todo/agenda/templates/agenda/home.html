@@ -3,41 +3,31 @@
 {% load static %}
 
 {% block metadata %}
+  <link rel="stylesheet" href="{% static 'taskboard.css' %}">
+
   <script type="text/javascript" src="{% static 'new_task_form.js' %}"></script>
   <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
+  <script type="text/javascript" src="{% static 'taskboard.js' %}"></script>
 {% endblock %}
   
 {% block content %}
 
-<button class="open-dialog-button button-primary" data-target="new-task-dialog">New Task</button>
+<div class="layout-body-split">
 
-{% for group, task_list in tasks.items %}
+  <div class="layout-left-body"></div>
 
-<ul>
+  <div class="layout-center-right">
 
-  <li>
+    <ul class="horizontal-list element-list taskboard">
 
-    <b>{% if group %} {{ group.title }} {% else %} Uncategorized {% endif %}</b>
+    </ul>
 
-    <ol>
+    <!--User Token-->
+    <input type="hidden" value="{{ user_token }}" id="user_token">
 
-      {% for task in task_list %}
+  </div>
 
-      <li>{{ task.title }}</li>
-
-      {% endfor %}
-
-    </ol>
-
-  </li>
-
-</ul>
-
-{% empty %}
-
-<h3>There are no tasks yet.</h3>
-
-{% endfor %}
+</div>
 
 <!--New Task form-->
 <dialog closedBy="any" id="new-task-dialog">
@@ -73,8 +63,5 @@
 
 </dialog>
 
-
-<!--User Token-->
-<input type="hidden" value="{{ user_token }}" id="user_token">
 
 {% endblock %}

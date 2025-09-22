@@ -50,7 +50,7 @@ button {
 
 }
 
-.button-primary:active {
+.button-primary:active, .button-primary[data-toggle="true"] {
 
   background-color: #0011ffff;
   border: 1px solid #0011ffff;
@@ -81,7 +81,7 @@ button {
 
 }
 
-.button-secondary:active {
+.button-secondary:active, .button-secondary[data-toggle="true"] {
 
   background-color: #304050ff;
   border: 1px solid #304050ff;
@@ -112,7 +112,7 @@ button {
 
 }
 
-.button-warning:active {
+.button-warning:active, .button-warning[data-toggle="true"] {
 
   background-color: #aa0000ff;
   border: 1px solid #aa0000ff;
@@ -142,7 +142,7 @@ button {
 
 }
 
-.button-accept:active {
+.button-accept:active, .button-accept[data-type="true"] {
 
   background-color: #006600ff;
   border: 1px solid #006600ff;

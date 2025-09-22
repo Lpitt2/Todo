@@ -10,6 +10,10 @@ urlpatterns = [
   path("register", views.register_view, name="register"),
   path("tasks", views.task_view, name="task-view"),
 
+  # General information API.
+  path("user/groups", views.user_group_info, name="user-group-info"),
+  path("user/tasks", views.user_task_info, name="user-task-info"),
+
   # Task API.
   path("task/info/<int:task_id>", views.task_info, name="task-info"),
   path("task/edit/<int:task_id>", views.task_edit, name="task-edit"),

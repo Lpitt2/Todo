@@ -1,0 +1,21 @@
+.horizontal-list {
+
+  display: flex;
+  flex-direction: row;
+  gap: 10pt;
+
+  padding: 0px;
+  margin: 0px;
+  height: 100%;
+
+}
+
+.element-list {
+
+  list-style: none;
+
+  padding: 0px;
+
+  gap: 10pt;
+
+}
