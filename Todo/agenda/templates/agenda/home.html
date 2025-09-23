@@ -5,7 +5,6 @@
 {% block metadata %}
   <link rel="stylesheet" href="{% static 'taskboard.css' %}">
 
-  <script type="text/javascript" src="{% static 'new_task_form.js' %}"></script>
   <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
   <script type="text/javascript" src="{% static 'taskboard.js' %}"></script>
 {% endblock %}
@@ -56,6 +55,8 @@
       <input id="new-task-due-date-field" type="date">
 
     </div>
+
+    <input type="hidden" id="group-id-field">
 
     <button class="button-accept">Create Task</button>
 

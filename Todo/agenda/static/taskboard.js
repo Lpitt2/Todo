@@ -3,6 +3,12 @@ const connection = new WebSocket("ws://localhost:8000/sockets/user");
 
 document.addEventListener("DOMContentLoaded", () => {
 
+  // Declare variables.
+  const form_object = document.getElementById("new-task-form");
+
+  // Add the event listeners.
+  form_object.addEventListener("submit", handle_new_task_submission);
+
   // Setup the websocket event handlers.
   connection.addEventListener("message", handle_socket_update);
 
@@ -60,6 +66,31 @@ function change_state_of_task_block(block, state) {
 
 }
 
+
+function handle_new_task_button_pressed(event) {
+
+  // Declare variables.
+  const group_id = event.currentTarget.parentElement.parentElement.dataset['group'];
+  const group_id_box = document.getElementById("group-id-field");
+  const dialog = document.getElementById("new-task-dialog");
+  const title_field = document.getElementById("new-task-title-field");
+  const description_field = document.getElementById("new-task-description-field");
+  const due_date_field = document.getElementById("new-task-due-date-field");
+
+  // Clear the fields.
+  title_field.value = "";
+  description_field.value = "";
+  due_date_field.value = "";
+
+  // Set the id.
+  group_id_box.value = group_id;
+
+  // Display the dialog.
+  dialog.showModal();
+
+}
+
+
 // Handle the complete button click event.
 function handle_task_complete_clicked(event) {
 
@@ -78,6 +109,13 @@ function handle_task_complete_clicked(event) {
       'complete': completed
     })
   });
+
+  // Send the update to the web socket.
+  connection.send(JSON.stringify({
+    'activity': "UPDATE",
+    'type': "TASK",
+    'id': task_block.dataset['task']
+  }));
 
 }
 
@@ -163,6 +201,9 @@ function build_group_list(group_id) {
   header.append(new_task_button);
   group_box.append(task_list);
 
+  // Add the event handler to the new task button.
+  new_task_button.addEventListener("click", handle_new_task_button_pressed);
+
   // Add group box to the taskboard.
   document.querySelector(".taskboard").append(group_box);
 
@@ -194,8 +235,71 @@ function render() {
 
 }
 
+// Handles updates from web socket server.
 function handle_socket_update(message) {
 
-  console.log(message);
+  console.log(message['data']);
+
+}
+
+function handle_new_task_submission(event) {
+
+  // Declare constants.
+  const REQUEST_URL = "http://localhost:8000/task/new";
+
+  // Get the objects from the form.
+  const title_field = document.getElementById("new-task-title-field");
+  const descript_field = document.getElementById("new-task-description-field");
+  const due_date_field = document.getElementById("new-task-due-date-field");
+  const group_id_field = document.getElementById("group-id-field");
+
+  // Get the alert object.
+  const alert_object = document.getElementById("new-task-alert");
+
+  // Get the date object.
+  let due_date = due_date_field.valueAsDate
+
+  // Create the due date object.
+  let = due_date_data = null;
+
+  if (due_date != null) {
+    due_date_data = {
+      year: due_date.getFullYear(),
+      month: due_date.getMonth() + 1,
+      day: due_date.getDate()
+    };
+  }
+
+  // Build the JSON object.
+  let data = {
+    title: title_field.value,
+    description: descript_field.value,
+    due_date: due_date_data,
+    group: group_id_field.value
+  };
+
+  // Send the data to the server.
+  fetch(REQUEST_URL, {
+    'method': 'PUT',
+    'body': JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+
+      // Send the update information to the web socket.
+      connection.send(JSON.stringify({
+        'activity': "CREATE",
+        'type': "TASK",
+        'id': data['id']
+      }));
+
+  }).catch(error => {
+    alert_object.innerHTML = "Something went wrong.";
+  });
+  
+  // Prevent the form from submitting and re-rendering the page.
+  event.preventDefault();
+
+  document.getElementById("new-task-dialog").close();
 
 }

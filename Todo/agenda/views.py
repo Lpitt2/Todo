@@ -361,11 +361,26 @@ def task_new(request):
   if (("due_date" in data) and (data['due_date'] != None) and ("year" in data['due_date']) and ("month" in data["due_date"]) and ("day" in data["due_date"])):
     task.due_date = date(data['due_date']['year'], data['due_date']['month'], data['due_date']['day'])
 
+  # Add the task to a group if necessary.
+  if ("group" in data):
+    
+    # Attempt to find the group.
+    group = get_object_or_404(TaskGroup, pk=data['group'])
+
+    # Assign the task to the group.
+    task.group = group
+
+
   # Save the task.
   task.save()
 
+  # Construct the data object.
+  data = {
+    'id': task.id
+  }
+
   # Load the information into the task object.
-  return HttpResponse(status=200)
+  return JsonResponse(data)
 
 
 # Group API.
@@ -469,4 +484,6 @@ def group_new(request):
   # Save the group.
   group.save()
 
-  return HttpResponse(status=200)
+  return JsonResponse({
+    'id': group.id
+  })
