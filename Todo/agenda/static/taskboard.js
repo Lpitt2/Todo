@@ -25,13 +25,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+// Handle the title being changed by the user.
+function handle_group_title_change(event) {
 
-function handle_group_title_change() {
+  // Declare local variables.
+  const title_box = event.target;
+  const group_id = title_box.parentElement.parentElement.dataset['group'];
 
-
+  // Send update request to the server.
+  fetch (`http://localhost:8000/group/edit/${group_id}`, {
+    'method': 'PUT',
+    'body': JSON.stringify({
+      'title': title_box.innerHTML
+    })
+  });
 
 }
 
+// Change the style of the task block.
 function change_state_of_task_block(block, state) {
 
   // Get the title block.
@@ -49,6 +60,7 @@ function change_state_of_task_block(block, state) {
 
 }
 
+// Handle the complete button click event.
 function handle_task_complete_clicked(event) {
 
   // Declare variables.
@@ -80,6 +92,8 @@ function build_group_list(group_id) {
   const new_task_button = document.createElement("button");
   const icon = document.createElement("img");
 
+  // Set the group id in the dataset.
+  group_box.dataset['group'] = group_id;
 
   // Get the group information from the server.
   fetch(`http://localhost:8000/group/info/${group_id}`)
@@ -88,6 +102,9 @@ function build_group_list(group_id) {
     
     // Set the title element.
     title.innerHTML = data['title'];
+
+    // Add the event handler to the title.
+    title.addEventListener("focusout", handle_group_title_change);
 
     // Iterate over the tasks within the group.
     data['tasks'].forEach(task => {
@@ -151,6 +168,7 @@ function build_group_list(group_id) {
 
 }
 
+// Constructs the groups and tasks within the taskboard.
 function render() {
 
   // Declare variables.
