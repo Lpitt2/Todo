@@ -20,8 +20,11 @@ class UserConsumer(WebsocketConsumer):
 
   def disconnect(self, close_code):
     
-    # Disconnect the user from the group.
-    async_to_sync(self.channel_layer.group_discard)(self.group_name, self.channel_name)
+    # Determine if the socket is in a group.
+    if (self.group_name != None):
+
+      # Disconnect the user from the group.
+      async_to_sync(self.channel_layer.group_discard)(self.group_name, self.channel_name)
 
 
   def receive(self, text_data):

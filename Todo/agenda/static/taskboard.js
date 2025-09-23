@@ -1,9 +1,23 @@
+const connection = new WebSocket("ws://localhost:8000/sockets/user");
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Declare variables.
-  const taskboard = document.getElementById("taskboard");
-  const connection = new WebSocket("ws://localhost:8000/sockets/user");
-  const token = document.getElementById("user_token").value;
+  // Setup the websocket event handlers.
+  connection.addEventListener("message", handle_socket_update);
+
+  // Send the user token to the socket.
+  connection.addEventListener("open", () => {
+
+    // Get the token.
+    token = document.getElementById("user_token").value;
+
+    // Send the token.
+    connection.send(JSON.stringify({
+      'user-token': token
+    }));
+
+  });
 
   // Render the taskboard.
   render();
@@ -18,9 +32,40 @@ function handle_group_title_change() {
 
 }
 
-function handle_task_complete_clicked() {
+function change_state_of_task_block(block, state) {
 
+  // Get the title block.
+  const title_block = block.querySelector("span");
+  const check_box = block.querySelector("input");
 
+  // Style based on the state of the block.
+  if (state)
+    title_block.style.setProperty("text-decoration", "line-through");
+  else
+    title_block.style.setProperty("text-decoration", "none");
+
+  // Ensure the ckeckbox style.
+  check_box.checked = state;
+
+}
+
+function handle_task_complete_clicked(event) {
+
+  // Declare variables.
+  const task_block = event.target.parentElement;
+
+  let completed = event.target.checked;
+
+  // Determine if the task is checked off.
+  change_state_of_task_block(task_block, completed);
+
+  // Send the update information to the server.
+  fetch(`http://localhost:8000/task/edit/${task_block.dataset['task']}`, {
+    'method': 'PUT',
+    'body': JSON.stringify({
+      'complete': completed
+    })
+  });
 
 }
 
@@ -34,7 +79,6 @@ function build_group_list(group_id) {
   const task_list = document.createElement("ul");
   const new_task_button = document.createElement("button");
   const icon = document.createElement("img");
-  let tasks = [];
 
 
   // Get the group information from the server.
@@ -51,14 +95,25 @@ function build_group_list(group_id) {
       // Create the elements.
       const task_box = document.createElement("li");
       const completion_box = document.createElement("input");
+      const task_title = document.createElement("span");
+
+      // Set the value of task_title.
+      task_title.textContent = task['title'];
+
+      // Build the task block.
+      task_box.append(completion_box);
+      task_box.append(task_title);
 
       // Style the elements.
       task_box.classList.add("task-block");
       completion_box.type = "checkbox";
+      change_state_of_task_block(task_box, task['completed']);
 
-      // Build the task block.
-      task_box.append(completion_box);
-      task_box.append(task['title']);
+      // Add event handler.
+      completion_box.addEventListener("click", handle_task_complete_clicked);
+
+      // Set the id for the task.
+      task_box.dataset['task'] = task['id'];
 
       // Append the task box to the task list.
       task_list.append(task_box);
@@ -121,8 +176,8 @@ function render() {
 
 }
 
-function handle_socket_update() {
+function handle_socket_update(message) {
 
-
+  console.log(message);
 
 }
