@@ -51,14 +51,16 @@
     </div>
 
     <!--Description field-->
-    <div>
+    <div style="margin: 10pt;">
 
-      <textarea id="new-task-description-field" rows="20" cols="50"></textarea>
+      <div><label for="new-task-description-field">Description:</label></div>
+
+      <textarea id="new-task-description-field" rows="10" cols="60"></textarea>
 
     </div>
 
     <!--Due Date field-->
-    <div>
+    <div style="margin: 10pt;">
 
       <input id="new-task-due-date-field" type="date">
 
@@ -78,7 +80,7 @@
   <form id="new-group-form">
     
     <!--Group name field-->
-    <div>
+    <div style="margin: 10pt;">
 
       <input type="text" placeholder="Group Name" id="new-group-name-field"/>
 
@@ -87,6 +89,47 @@
     <div>
 
       <button class="button-accept">Create Group</button>
+
+    </div>
+
+  </form>
+
+</dialog>
+
+<!--Edit Task dialog-->
+<dialog closedBy="any" id="edit-task-dialog">
+
+  <form id="edit-task-form">
+
+    <!--Task Name field-->
+    <div>
+
+      <input type="text" placeholder="Title" id="edit-task-title-field" required/>
+
+    </div>
+
+    <!--Description field-->
+    <div style="margin: 10pt;">
+
+      <div><label for="new-task-description-field">Description:</label></div>
+
+      <textarea rows="10" cols="60" id="edit-task-description-field"></textarea>
+
+    </div>
+
+    <!--Due-Date field-->
+    <div style="margin: 10pt;">
+
+      <input type="date" id="edit-task-due-date-field"/>
+
+    </div>
+
+    <!--Task ID field-->
+    <input type="hidden" id="edit-task-id-field"/>
+
+    <div>
+
+      <button class="button-accept">Update Task</button>
 
     </div>
 

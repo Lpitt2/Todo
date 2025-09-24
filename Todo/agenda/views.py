@@ -233,17 +233,22 @@ def task_info(request, task_id):
       'group_title': task.group.title
     }
 
+  # Determine if the task has a due-date.
+  due_date = None
+  if (task.due_date != None):
+    due_date = {
+      'year': task.due_date.year,
+      'month': task.due_date.month,
+      'day': task.due_date.day
+    }
+
   # Build the response.
   data = {
     'id': task.id,
     'title': task.title,
     'description': task.description,
     'completed': task.completion_status,
-    'due_date': {
-      'year': task.due_date.year,
-      'month': task.due_date.month,
-      'day': task.due_date.day
-    },
+    'due_date': due_date,
     'group': group_data,
     'owner': {
       'ID': task.owner.id,

@@ -160,7 +160,7 @@ class UserConsumer(WebsocketConsumer):
 
       self.send(JSONEncoder.encode({
         'status': 403,
-        'message': f"User does not have ownership of task id {data['id']}"
+        'message': f"User does not have ownership of task {data['id']}"
       }))
 
     # Set up the due date information.
@@ -235,6 +235,45 @@ class UserConsumer(WebsocketConsumer):
 
   def handle_group_update(self, data):
     '''Handles group update requests.'''
+
+    # Declare variables.
+    group = None
+
+    # Attempt to get the group object.
+    try:
+
+      group = TaskGroup.objects.get(pk=data['id'])
+
+    except(TaskGroup.DoesNotExist):
+
+      # Send an error to the user.
+      self.send(JSONEncoder().encode({
+        'status': 404,
+        'message': f"Unable to locate group {data['id']}"
+      }))
+
+      return
+
+    # Verify that the user is the owner of the group.
+    if (self.user != group.owner):
+
+      # Send error to the user.
+      self.send(JSONEncoder().encode({
+        'status': 403,
+        'message': f"User does not have ownership of group {data['id']}"
+      }))
+
+      return
+
+    # Send the update information to all users within the group.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': "UPDATE",
+        'type': "GROUP",
+        'title': group.title
+      })
+    })
 
   def handle_group_delete(self, data):
     '''Handles group deletion requests.'''
