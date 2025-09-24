@@ -57,12 +57,18 @@ class UserConsumer(WebsocketConsumer):
     if (self.group_name != None and 'activity' in data):
 
       # Handle the requested activity accordingly.
-      if (data['activity'] == "CREATE"):
-        self.handle_creation(data)
-      elif (data['activity'] == "UPDATE"):
-        self.handle_update(data)
-      elif (data['activity'] == "DELETE"):
-        self.handle_delete(data)
+      if (data['activity'] == "CREATE" and data['type'] == "TASK"):
+        self.handle_task_creation(data)
+      elif (data['activity'] == "CREATE" and data['type'] == "GROUP"):
+        self.handle_group_creation(data)
+      elif (data['activity'] == "UPDATE" and data['type'] == "TASK"):
+        self.handle_task_update(data)
+      elif (data['activity'] == "UPDATE" and data['type'] == "GROUP"):
+        self.handle_group_update(data)
+      elif (data['activity'] == "DELETE" and data['type'] == "TASK"):
+        self.handle_task_delete(data)
+      elif (data['activity'] == "DELETE" and data['type'] == "GROUP"):
+        self.handle_group_delete(data)
       else:
 
         self.send(JSONEncoder().encode({
@@ -78,8 +84,8 @@ class UserConsumer(WebsocketConsumer):
       }))
 
     
-  def handle_creation(self, data):
-    '''Handles creation requests'''
+  def handle_task_creation(self, data):
+    '''Handles task creation requests'''
 
     # Declare variables.
     task = None
@@ -96,12 +102,17 @@ class UserConsumer(WebsocketConsumer):
         'message': f"Unable to locate task {data['id']}"
       }))
 
+      return
+
+    # Ensure that the user has ownership of this group.
     if (self.user != task.owner):
 
       self.send(JSONEncoder().encode({
         'status': 403,
         'message': f"User does not have ownership of the task id {data['id']}"
       }))
+
+      return
       
     # Set up the due date information.
     due_date = None if task.due_date == None else {
@@ -126,8 +137,8 @@ class UserConsumer(WebsocketConsumer):
       }})
     })
     
-  def handle_update(self, data):
-    '''Handles updating requests'''
+  def handle_task_update(self, data):
+    '''Handles task updating requests'''
     
     # Declare variables.
     task = None
@@ -175,9 +186,59 @@ class UserConsumer(WebsocketConsumer):
       }
     })})
 
-  def handle_delete(self, data):
-    '''Handles deleting requests'''
+  def handle_task_delete(self, data):
+    '''Handles task deletion requests'''
     print("User deleted object.")
+
+  def handle_group_creation(self, data):
+    '''Handles group creation requests.'''
+
+    # Declare variables.
+    group = None
+
+    # Attempt to get the group object.
+    try:
+
+      group = TaskGroup.objects.get(pk=data['id'])
+
+    except (TaskGroup.DoesNotExist):
+
+      self.send(JSONEncoder().encode({
+        'status': 404,
+        'message': f"Unable to locate group {data['id']}"
+      }))
+
+      return
+
+    # Ensure that the user has ownership of this group.
+    if (self.user != group.owner):
+      
+      self.send(JSONEncoder().encode({
+        'status': 403,
+        'message': f"User does not have ownership of task id {data['id']}"
+      }))
+
+      return
+    
+    # Send the update information to all users.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': "CREATE",
+        'type': "GROUP",
+        'data': {
+          'id': group.id,
+          'title': group.title
+        }
+      })
+    })
+
+  def handle_group_update(self, data):
+    '''Handles group update requests.'''
+
+  def handle_group_delete(self, data):
+    '''Handles group deletion requests.'''
+
 
   def relay(self, event):
     '''Sends the message to the current user.'''

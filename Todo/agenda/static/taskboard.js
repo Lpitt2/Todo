@@ -3,11 +3,10 @@ const connection = new WebSocket("ws://localhost:8000/sockets/user");
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Declare variables.
-  const form_object = document.getElementById("new-task-form");
-
-  // Add the event listeners.
-  form_object.addEventListener("submit", handle_new_task_submission);
+  // Add the form event listeners.
+  document.getElementById("new-task-form").addEventListener("submit", handle_new_task_submission);
+  document.getElementById("new-group-form").addEventListener("submit", handle_new_group_submission);
+  document.getElementById("new-group-dialog").addEventListener("close", handle_new_group_dialog_close);
 
   // Setup the websocket event handlers.
   connection.addEventListener("message", handle_socket_update);
@@ -96,7 +95,6 @@ function handle_task_complete_clicked(event) {
 
   // Declare variables.
   const task_block = event.target.parentElement;
-
   let completed = event.target.checked;
 
   // Determine if the task is checked off.
@@ -300,6 +298,51 @@ function handle_new_task_submission(event) {
   // Prevent the form from submitting and re-rendering the page.
   event.preventDefault();
 
+  // Close the dialog window.
   document.getElementById("new-task-dialog").close();
+
+}
+
+// Handles the user requesting a new group.
+function handle_new_group_submission(event) {
+
+  // Declare variables.
+  const group_name = document.getElementById("new-group-name-field").value;
+
+  // Build the request object.
+  let data = {
+    'title': group_name
+  };
+
+  // Send the new group request to the server.
+  fetch("http://localhost:8000/group/new", {
+    'method': "PUT",
+    'body': JSON.stringify(data)
+  })
+  .then(resp => resp.json())
+  .then(data => {
+    
+    // Send the new group information to the web socket server.
+    connection.send(JSON.stringify({
+      'activity': "CREATE",
+      'type': "GROUP",
+      'id': data['id']
+    }));
+
+  });
+
+  // Prevent the form from submitting and re-rendering the page.
+  event.preventDefault();
+
+  // Close the dialog window.
+  document.getElementById("new-group-dialog").close();
+
+}
+
+// Handles the closing process of the dialog.
+function handle_new_group_dialog_close() {
+
+  // Clear the contents of the fields.
+  document.getElementById("new-group-name-field").value = "";
 
 }
