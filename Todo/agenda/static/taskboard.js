@@ -189,93 +189,116 @@ function handle_edit_task_submission(event) {
 
 
 // Constructs the group list boxes given the title and ID.
-function build_group_list(group_id) {
+function build_group(group_id) {
 
   // Declare variables.
-  const group_box = document.createElement("li");
-  const header = document.createElement("div");
-  const title = document.createElement("div");
-  const task_list = document.createElement("ul");
-  const new_task_button = document.createElement("button");
-  const icon = document.createElement("img");
-
-  // Set the group id in the dataset.
-  group_box.dataset['group'] = group_id;
+  let group_box = null;
 
   // Get the group information from the server.
   fetch(`http://localhost:8000/group/info/${group_id}`)
   .then(response => response.json())
   .then(data => {
-    
-    // Set the title element.
-    title.innerHTML = data['title'];
 
-    // Add the event handler to the title.
-    title.addEventListener("focusout", handle_group_title_change);
+    // Create the group box.
+    group_box = build_group_box(data['title'], group_id, data['tasks']);
 
-    // Iterate over the tasks within the group.
-    data['tasks'].forEach(task => {
-      
-      // Create the elements.
-      const task_box = document.createElement("li");
-      const completion_box = document.createElement("input");
-      const task_title = document.createElement("span");
+    // Get the task list.
+    const task_list = group_box.querySelector(".element-list");
 
-      // Set the value of task_title.
-      task_title.textContent = task['title'];
-
-      // Build the task block.
-      task_box.append(completion_box);
-      task_box.append(task_title);
-
-      // Style the elements.
-      task_box.classList.add("task-block");
-      completion_box.type = "checkbox";
-      change_state_of_task_block(task_box, task['completed']);
-
-      // Add event handler.
-      completion_box.addEventListener("click", handle_task_complete_clicked);
-      task_box.addEventListener("click", handle_task_edit_clicked);
-
-      // Set the id for the task.
-      task_box.dataset['task'] = task['id'];
-
-      // Append the task box to the task list.
-      task_list.append(task_box);
-
-    });
+    // Add the group box to the taskboard.
+    document.querySelector(".taskboard").append(group_box);
 
   });
 
+}
 
-  // Set up the styling for the elements.
+// Constructs the group box.
+function build_group_box(group_title, group_id, tasks = []) {
+
+  // Declare variables.
+  const group_box = document.createElement("li");
+  const header = document.createElement("div");
+  const title = document.createElement("div");
+  const new_task_button = document.createElement("button");
+  const icon = document.createElement("img");
+  const task_list = document.createElement("ul");
+
+  // Build the structure of the group box.
+  new_task_button.append(icon);
+  header.append(title);
+  header.append(new_task_button);
+  group_box.append(header);
+  group_box.append(task_list);
+
+  // Set the group id data attribute.
+  group_box.dataset['group'] = group_id;
+
+  // Set up the group title.
+  title.innerHTML = group_title;
+  title.contentEditable = true;
+
+  // Set the event handlers.
+  new_task_button.addEventListener("click", handle_new_task_button_pressed);
+  title.addEventListener("focusout", handle_group_title_change);
+
+  // Set up the icon.
+  icon.src = "static/icons/plus.svg";
+  icon.width = 10;
+  icon.height = 10;
+
+  // Apply CSS styling to the elements.
   group_box.classList.add("task-list-block");
   header.classList.add("left-right-container");
   new_task_button.classList.add("right-container");
   new_task_button.classList.add("open-dialog-button");
   new_task_button.classList.add("button-accept");
-  task_list.classList.add("element-list");
+  task_list.classList.add("element-list");  
 
-  // Set up the icon for the new task button.
-  icon.src = "static/icons/plus.svg";
-  icon.width = 10;
-  icon.height = 10;
+  // Construct the task block objects.
+  tasks.forEach(task => {
 
-  // Set up the title.
-  title.contentEditable = true;
+    // Create the task block.
+    const task_box = build_task_block(task['id'], task['title'], task['completed']);
 
-  // Build the structure of the group block.
-  group_box.append(header);
-  header.append(title);
-  new_task_button.append(icon);
-  header.append(new_task_button);
-  group_box.append(task_list);
+    // Append the task box to the list.
+    task_list.append(task_box);
 
-  // Add the event handler to the new task button.
-  new_task_button.addEventListener("click", handle_new_task_button_pressed);
+  });
 
-  // Add group box to the taskboard.
-  document.querySelector(".taskboard").append(group_box);
+  return group_box;
+
+}
+
+// Consturcts task blocks.
+function build_task_block(task_id, title, complete) {
+
+  // Declare elements.
+  const task_box = document.createElement("li");
+  const completion_box = document.createElement("input");
+  const task_title = document.createElement("span");
+
+  // Build the structure of the task block.
+  task_box.append(completion_box);
+  task_box.append(task_title);
+
+  // Add the event handlers.
+  completion_box.addEventListener("click", handle_task_complete_clicked);
+  task_box.addEventListener("click", handle_task_edit_clicked);
+
+  // Apply CSS styling.
+  task_box.classList.add("task-block");
+
+  // Set up the completition checkbox.
+  completion_box.type = "checkbox";
+  change_state_of_task_block(task_box, complete);
+
+  // Set the title of the task block.
+  task_title.textContent = title;
+
+  // Set the task ID.
+  task_box.dataset['task'] = task_id;
+
+  return task_box;
 
 }
 
@@ -297,7 +320,7 @@ function render() {
     data['groups'].forEach(group => {
 
       // Build the current group.
-      build_group_list(group['id']);
+      build_group(group['id']);
 
     });
 
@@ -321,7 +344,47 @@ function handle_initial_socket_connection() {
 // Updates the task board in response to the websocket.
 function handle_socket_update(message) {
 
-  console.log(message['data']);
+  console.log(message);
+
+  const data = JSON.parse(message['data']);
+  const activity = data['activity'];
+  const type = data['type'];
+
+  console.log(activity);
+  console.log(type);
+
+  // Separate the request into the activitiy.
+  if (data['activity'] == "CREATE") {
+
+    // Separate further into the type.
+    if (data['type'] == "GROUP") {
+
+      // Build the group in the taskboard.
+      document.querySelector(".taskboard").append(build_group_box(data['data']['title'], data['data']['id']));
+
+    } else if (data['type'] == "TASK") {
+
+    }
+
+  } else if (data['activity'] == "UPDATE") {
+
+    // Separate further into the type.
+    if (data['type'] == "GROUP") {
+
+    } else if (data['type'] == "TASK") {
+
+    }
+
+  } else if (data['activity'] == "DELETE") {
+
+    // Separate further into the type.
+    if (data['type'] == "GROUP") {
+
+    } else if (data['type'] == "TASK") {
+
+    }
+
+  }
 
 }
 
