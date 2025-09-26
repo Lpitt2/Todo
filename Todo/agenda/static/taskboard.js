@@ -273,6 +273,8 @@ function build_group(group_id) {
     // Get the task list.
     const task_list = group_box.querySelector(".element-list");
 
+    group_box.style.setProperty("order", group_id);
+
     // Add the group box to the taskboard.
     document.querySelector(".taskboard").append(group_box);
 
