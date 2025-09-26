@@ -29,7 +29,7 @@
 
 }
 
-.task-block {
+.task-list > li {
 
   display: flex;
   flex-direction: row;
@@ -40,13 +40,35 @@
   margin: 4pt;
   padding: 8pt;
 
-  background-color: #7b7b7b;
   color: #bbbbbbff;
 
   word-wrap: normal;
 
 }
 
+.future-task {
+
+  background-color: #7b7b7b;
+
+}
+
+.late-task {
+
+  background-color: #dd1111;
+
+}
+
+.due-today-task {
+
+  background-color: #3377ff;
+
+}
+
+.completed-task {
+
+  background-color: #00dd00;
+
+}
 
 .title-field {
 

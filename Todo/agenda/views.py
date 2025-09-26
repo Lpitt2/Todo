@@ -392,7 +392,12 @@ def group_info(request, group_id):
       {
         'id': task.id,
         'title': task.title,
-        'completed': task.completion_status
+        'completed': task.completion_status,
+        'due_date': None if task.due_date == None else {
+          'year': task.due_date.year,
+          'month': task.due_date.month,
+          'day': task.due_date.day
+        }
       } for task in Task.objects.filter(group=group_id)
     ]
   }

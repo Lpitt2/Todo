@@ -123,13 +123,18 @@ async function handle_task_edit_clicked(event) {
   title_field.value = task_data['title'];
   description_field.innerHTML = task_data['description'];
   
-  if (task_data['due-date'] != null) {
+  // Handle 
+  if (task_data['due_date'] != null) {
 
     // Construct the date object.
-    let date = new Date(task_data['due-date']['year'], task_data['due-date']['month'], task_data['due-date']['day']);
+    let date = new Date(task_data['due_date']['year'], task_data['due_date']['month'] - 1, task_data['due_date']['day']);
 
     // Set the due-date field.
     due_date_field.valueAsDate = date;
+
+  } else {
+
+    due_date_field.value = "";
 
   }
 
@@ -189,9 +194,9 @@ function handle_edit_task_submission(event) {
   if (due_date != null) {
 
     due_date_data = {
-      'year': due_date.year,
-      'month': due_date.month,
-      'day': due_date.day
+      'year': due_date.getFullYear(),
+      'month': due_date.getMonth() + 1,
+      'day': due_date.getDate()
     };
 
   }
@@ -202,7 +207,7 @@ function handle_edit_task_submission(event) {
     'body': JSON.stringify({
       'title': title,
       'description': description,
-      'due-date': due_date_data,
+      'due_date': due_date_data,
       'group': group_id
     })
   })
@@ -329,13 +334,24 @@ function build_group_box(group_title, group_id, tasks = []) {
   new_task_button.classList.add("button-accept");
   delete_group_button.classList.add("button-warning");
   task_list.classList.add("element-list");
+  task_list.classList.add("task-list");
   button_group_bar.classList.add("button-group-row");
 
   // Construct the task block objects.
   tasks.forEach(task => {
 
+      // Create the due-date object.
+      let due_date = null;
+      if (task['due_date'] != null) {
+
+        due_date = new Date(task['due_date']['year'], task['due_date']['month'] - 1, task['due_date']['day']);
+
+      }
+
     // Create the task block.
-    const task_box = build_task_block(task['id'], task['title'], task['completed']);
+    const task_box = build_task_block(task['id'], task['title'], task['completed'], due_date);
+
+    // Apply styling to the task.
 
     // Append the task box to the list.
     task_list.append(task_box);
@@ -347,7 +363,7 @@ function build_group_box(group_title, group_id, tasks = []) {
 }
 
 // Consturcts task blocks.
-function build_task_block(task_id, title, complete) {
+function build_task_block(task_id, title, complete, due_date) {
 
   // Declare elements.
   const task_box = document.createElement("li");
@@ -373,8 +389,8 @@ function build_task_block(task_id, title, complete) {
   delete_icon.addEventListener("click", handle_task_delete_clicked);
 
   // Apply CSS styling.
-  task_box.classList.add("task-block");
   delete_container.className = "hover-icon";
+  style_task_block(task_box, complete, due_date);
 
   // Set up the completition checkbox.
   completion_box.type = "checkbox";
@@ -388,6 +404,33 @@ function build_task_block(task_id, title, complete) {
   task_box.id = `task-${task_id}`;
 
   return task_box;
+
+}
+
+// Applys conditional styling to a task block given the completion status and due-date.
+function style_task_block(task_block, complete, due_date) {
+
+    // Declare variables.
+    let today = new Date();
+
+    // Determine if the task block is completed.
+    if (complete) {
+
+      task_block.className = "completed-task";
+
+    } else if ((due_date == null) || (today.getFullYear() < due_date.getFullYear()) || (today.getFullYear() == due_date.getFullYear() && today.getMonth() < due_date.getMonth()) || (today.getFullYear() == due_date.getFullYear() && today.getMonth() == due_date.getMonth() && today.getDate() < due_date.getDate())) {
+
+      task_block.className = "future-task";
+
+    } else if ((today.getDate() == due_date.getDate()) && (today.getMonth() == due_date.getMonth()) && (today.getFullYear() == due_date.getFullYear())) {
+
+      task_block.className = "due-today-task";
+
+    } else {
+
+      task_block.className = "late-task";
+
+    }
 
 }
 
@@ -448,8 +491,16 @@ function handle_socket_update(message) {
 
     } else if (data['type'] == "TASK") {
 
+      // Create the due-date object.
+      let due_date = null;
+      if (data['data']['due_date'] != null) {
+
+        due_date = new Date(data['data']['due_date']['year'], data['data']['due_date']['month'], data['data']['due_date']['day']);
+
+      }
+
       // Create the task block.
-      const task_block = build_task_block(data['data']['id'], data['data']['title'], data['data']['completed']);
+      const task_block = build_task_block(data['data']['id'], data['data']['title'], data['data']['completed'], due_date);
 
       // Append the task block to the group.
       document.querySelector(`[data-group=\"${data['data']['group']}\"]`).querySelector(".element-list").append(task_block);
@@ -489,6 +540,17 @@ function handle_socket_update(message) {
 
       // Update the completion status.
       change_state_of_task_block(task_block, data['data']['complete']);
+
+      // Construct the due-date.
+      due_date = null;
+      if (data['data']['due_date'] != null) {
+
+        due_date = new Date(data['data']['due_date']['year'], data['data']['due_date']['month'] - 1, data['data']['due_date']['day']);
+
+      }
+
+      // Update the styling.
+      style_task_block(task_block, data['data']['complete'], due_date);
 
     }
 
