@@ -227,7 +227,7 @@ function handle_edit_task_submission(event) {
 function handle_task_delete_clicked(event) {
 
   // Declare variables.
-  const task_id = event.currentTarget.parentElement.dataset['task'];
+  const task_id = event.currentTarget.parentElement.parentElement.dataset['task'];
 
   // Send delete request to the server.
   fetch (`http://localhost:8000/task/delete/${task_id}`)
