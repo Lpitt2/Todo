@@ -24,3 +24,7 @@ class Task(models.Model):
   # Relationships.
   owner = models.ForeignKey(User, on_delete=models.CASCADE)
   group = models.ForeignKey(TaskGroup, on_delete=models.CASCADE)
+
+  class Meta:
+ 
+    ordering = [models.F("completion_status").asc(), models.F("due_date").asc(nulls_last=True)]

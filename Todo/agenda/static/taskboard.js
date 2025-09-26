@@ -123,7 +123,7 @@ async function handle_task_edit_clicked(event) {
   title_field.value = task_data['title'];
   description_field.innerHTML = task_data['description'];
   
-  // Handle 
+  // Update the due-date field.
   if (task_data['due_date'] != null) {
 
     // Construct the date object.
