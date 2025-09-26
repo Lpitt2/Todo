@@ -6,9 +6,9 @@ from . import consumers
 urlpatterns = [
   path("", views.index_view, name="index"),
   path("home", views.home_view, name="home"),
+  path("shared", views.shared_view, name="shared"),
   path("login", views.login_view, name="login"),
   path("register", views.register_view, name="register"),
-  path("tasks", views.task_view, name="task-view"),
 
   # General information API.
   path("user/groups", views.user_group_info, name="user-group-info"),

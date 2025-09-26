@@ -1,0 +1,34 @@
+{% extends './base/main_page.html' %}
+
+{% load static %}
+
+{% block metadata %}
+  <!--Place JavaScript tags here.-->
+{% endblock %}
+
+{% block content %}
+
+  <div class="layout-body-split">
+
+    <div class="layout-left-body">
+      
+      <ul class="element-list">
+
+        
+
+      </ul>
+
+    </div>
+
+    <div class="layout-center-right">
+
+
+
+    </div>
+
+    <!--User Token-->
+    <input type="hidden" value="{{ user_token }}" id="user_token">
+
+  </div>
+
+{% endblock %}

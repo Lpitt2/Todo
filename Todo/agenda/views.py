@@ -142,9 +142,16 @@ def home_view(request):
 
 
 @login_required(login_url="/login")
-def task_view(request):
-  '''Displays the task page to the logged in user.'''
-  return render(request, "agenda/task.html")
+def shared_view(request):
+  ''''''
+
+  # Extract the user.
+  user = request.user
+
+  # Ensure that the user is registered.
+  token = registration.register_user(request.user)
+
+  return render(request, "agenda/shared_dashboard.html", {'user_token': token})
 
 
 # API Requests.
