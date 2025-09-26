@@ -17,7 +17,7 @@
 
     <ul class="element-list">
 
-      <li><button class="open-dialog-button button-primary" data-target="new-group-dialog">Create New Group</button></li>
+      <li><button class="open-dialog-button button-primary stretch" data-target="new-group-dialog">Create New Group</button></li>
 
     </ul>
 
@@ -117,10 +117,14 @@
 
     </div>
 
-    <!--Due-Date field-->
-    <div style="margin: 10pt;">
+    <!--Group field-->
+    <div class="left-right-container" style="margin: 10pt;">
 
-      <input type="date" id="edit-task-due-date-field"/>
+      <label for="edit-group-field">Group:</label>
+
+      <select id="edit-task-group-field"></select>
+
+      <input class="right-container" type="date" id="edit-task-due-date-field"/>
 
     </div>
 

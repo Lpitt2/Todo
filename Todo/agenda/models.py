@@ -23,4 +23,4 @@ class Task(models.Model):
 
   # Relationships.
   owner = models.ForeignKey(User, on_delete=models.CASCADE)
-  group = models.ForeignKey(TaskGroup, on_delete=models.SET_NULL, default=None, blank=True, null=True)
+  group = models.ForeignKey(TaskGroup, on_delete=models.CASCADE)

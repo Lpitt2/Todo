@@ -135,25 +135,10 @@ def home_view(request):
   # Extract the user.
   user = request.user
 
-  # Declare tasks dictionary.
-  tasks = dict()
-
   # Ensure that the user is registered.
   token = registration.register_user(request.user)
 
-  # Iterate over the tasks owned by the 
-  for task in user.task_set.all():
-
-    # Determine if the task group exists yet.
-    if task.group not in tasks:
-
-      # Add a key for the group.
-      tasks[task.group] = list()
-
-    # Append the current task to the group.
-    tasks[task.group].append(task)
-
-  return render(request, "agenda/home.html", {'tasks': tasks, 'user_token': token})
+  return render(request, "agenda/home.html", {'user_token': token})
 
 
 @login_required(login_url="/login")
@@ -225,14 +210,6 @@ def task_info(request, task_id):
   if (task.owner != request.user):
     return HttpResponse(status=401)
   
-  # Determine if the task is within a group.
-  group_data = None
-  if (task.group != None):
-    group_data = {
-      'groupID': task.group.id,
-      'group_title': task.group.title
-    }
-
   # Determine if the task has a due-date.
   due_date = None
   if (task.due_date != None):
@@ -249,7 +226,10 @@ def task_info(request, task_id):
     'description': task.description,
     'completed': task.completion_status,
     'due_date': due_date,
-    'group': group_data,
+    'group': {
+      'title': task.group.title,
+      'id': task.group.id
+    },
     'owner': {
       'ID': task.owner.id,
       'username': task.owner.username

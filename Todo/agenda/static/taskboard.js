@@ -74,23 +74,23 @@ function handle_task_complete_clicked(event) {
   const task_block = event.target.parentElement;
   let completed = event.target.checked;
 
-  // Determine if the task is checked off.
-  change_state_of_task_block(task_block, completed);
-
   // Send the update information to the server.
   fetch(`http://localhost:8000/task/edit/${task_block.dataset['task']}`, {
     'method': 'PUT',
     'body': JSON.stringify({
       'complete': completed
     })
-  });
+  })
+  .then(response => {
 
-  // Send the update to the web socket.
-  connection.send(JSON.stringify({
-    'activity': "UPDATE",
-    'type': "TASK",
-    'id': task_block.dataset['task']
-  }));
+    // Send the update to the web socket.
+    connection.send(JSON.stringify({
+      'activity': "UPDATE",
+      'type': "TASK",
+      'id': task_block.dataset['task']
+    }));
+
+  });
 
   // Prevent the task edit dialog from displaying.
   event.stopPropagation();
@@ -98,7 +98,7 @@ function handle_task_complete_clicked(event) {
 }
 
 // Displays the task edit dialog and form.
-function handle_task_edit_clicked(event) {
+async function handle_task_edit_clicked(event) {
 
   // Declare variables.
   const id = event.currentTarget.dataset['task'];
@@ -108,31 +108,66 @@ function handle_task_edit_clicked(event) {
   const title_field = document.getElementById("edit-task-title-field");
   const description_field = document.getElementById("edit-task-description-field");
   const due_date_field = document.getElementById("edit-task-due-date-field");
+  const group_field = document.getElementById("edit-task-group-field");
   const task_id_field = document.getElementById("edit-task-id-field");
+  let current_group_id = null;
 
   // Set the id in the task id field.
   task_id_field.value = id;
 
   // Obtain the task information from the server.
-  fetch(`http://localhost:8000/task/info/${id}`)
-  .then(response => response.json())
-  .then(data => {
+  const task_response = await fetch(`http://localhost:8000/task/info/${id}`);
+  const task_data = await task_response.json();
 
-    // Set the default values.
-    title_field.value = data['title'];
-    description_field.innerHTML = data['description'];
-    
-    if (data['due-date'] != null) {
+  // Set the default values.
+  title_field.value = task_data['title'];
+  description_field.innerHTML = task_data['description'];
+  
+  if (task_data['due-date'] != null) {
 
-      // Construct the date object.
-      let date = new Date(data['due-date']['year'], data['due-date']['month'], data['due-date']['day']);
+    // Construct the date object.
+    let date = new Date(task_data['due-date']['year'], task_data['due-date']['month'], task_data['due-date']['day']);
 
-      // Set the due-date field.
-      due_date_field.valueAsDate = date;
+    // Set the due-date field.
+    due_date_field.valueAsDate = date;
+
+  }
+
+  if (task_data['group'] != null) {
+
+    // Set the current group id.
+    current_group_id = task_data['group']['id'];
+
+  }
+
+  // Remove the groups from the group field.
+  group_field.innerHTML = "";
+
+  // Obtain the group information.
+  const group_response = await fetch("http://localhost:8000/user/groups");
+  const group_data = await group_response.json();
+
+  // Iterate over each group object.
+  group_data['groups'].forEach(group => {
+
+    // Create the option.
+    const option = document.createElement("option");
+
+    // Set the value and text content.
+    option.value = group['id'];
+    option.textContent = group['title'];
+
+    // Determine if the current group is the active group for the task.
+    if (group['id'] == current_group_id) {
+
+      option.selected = true;
 
     }
 
-  });
+    // Append the option to the select element.
+    group_field.append(option);
+
+  })
 
   // Display the dialog.
   dialog.showModal();
@@ -146,6 +181,7 @@ function handle_edit_task_submission(event) {
   const title = document.getElementById("edit-task-title-field").value;
   const description = document.getElementById("edit-task-description-field").innerHTML;
   const due_date = document.getElementById("edit-task-due-date-field").valueAsDate;
+  const group_id = document.getElementById("edit-task-group-field").value;
   const id = document.getElementById("edit-task-id-field").value;
   let due_date_data = null;
 
@@ -166,7 +202,8 @@ function handle_edit_task_submission(event) {
     'body': JSON.stringify({
       'title': title,
       'description': description,
-      'due-date': due_date_data
+      'due-date': due_date_data,
+      'group': group_id
     })
   })
   .then(response => {
@@ -181,6 +218,32 @@ function handle_edit_task_submission(event) {
 
   // Prevent the page from reloading.
   event.preventDefault();
+
+  document.getElementById("edit-task-dialog").close();
+
+}
+
+// Requests that the selected task is deleted.
+function handle_task_delete_clicked(event) {
+
+  // Declare variables.
+  const task_id = event.currentTarget.parentElement.dataset['task'];
+
+  // Send delete request to the server.
+  fetch (`http://localhost:8000/task/delete/${task_id}`)
+  .then(response => {
+
+    // Send the update to the web socket server.
+    connection.send(JSON.stringify({
+      'activity': "DELETE",
+      'type': "TASK",
+      'id': task_id
+    }));
+
+  });
+
+  // Prevent the task edit dialog from displaying.
+  event.stopPropagation();
 
 }
 
@@ -219,14 +282,20 @@ function build_group_box(group_title, group_id, tasks = []) {
   const group_box = document.createElement("li");
   const header = document.createElement("div");
   const title = document.createElement("div");
+  const button_group_bar = document.createElement("div");
   const new_task_button = document.createElement("button");
-  const icon = document.createElement("img");
+  const delete_group_button = document.createElement("button");
+  const new_task_icon = document.createElement("img");
+  const delete_group_icon = document.createElement("img");
   const task_list = document.createElement("ul");
 
   // Build the structure of the group box.
-  new_task_button.append(icon);
+  new_task_button.append(new_task_icon);
+  delete_group_button.append(delete_group_icon);
+  button_group_bar.append(new_task_button);
+  button_group_bar.append(delete_group_button);
   header.append(title);
-  header.append(new_task_button);
+  header.append(button_group_bar);
   group_box.append(header);
   group_box.append(task_list);
 
@@ -239,20 +308,28 @@ function build_group_box(group_title, group_id, tasks = []) {
 
   // Set the event handlers.
   new_task_button.addEventListener("click", handle_new_task_button_pressed);
+  delete_group_button.addEventListener("click", handle_group_delete_button_pressed);
   title.addEventListener("focusout", handle_group_title_change);
 
-  // Set up the icon.
-  icon.src = "static/icons/plus.svg";
-  icon.width = 10;
-  icon.height = 10;
+  // Set up the new task icon.
+  new_task_icon.src = "static/icons/plus.svg";
+  new_task_icon.width = 10;
+  new_task_icon.height = 10;
+
+  // Set up the delete group icon.
+  delete_group_icon.src = "static/icons/delete.svg";
+  delete_group_icon.width = 10;
+  delete_group_icon.height = 10;
 
   // Apply CSS styling to the elements.
   group_box.classList.add("task-list-block");
   header.classList.add("left-right-container");
-  new_task_button.classList.add("right-container");
+  button_group_bar.classList.add("right-container");
   new_task_button.classList.add("open-dialog-button");
   new_task_button.classList.add("button-accept");
-  task_list.classList.add("element-list");  
+  delete_group_button.classList.add("button-warning");
+  task_list.classList.add("element-list");
+  button_group_bar.classList.add("button-group-row");
 
   // Construct the task block objects.
   tasks.forEach(task => {
@@ -276,17 +353,28 @@ function build_task_block(task_id, title, complete) {
   const task_box = document.createElement("li");
   const completion_box = document.createElement("input");
   const task_title = document.createElement("span");
+  const delete_container = document.createElement("div");
+  const delete_icon = document.createElement("img");
 
   // Build the structure of the task block.
+  delete_container.append(delete_icon);
   task_box.append(completion_box);
   task_box.append(task_title);
+  task_box.append(delete_container);
+
+  // Set up the delete icon information.
+  delete_icon.src = "/static/icons/delete.svg";
+  delete_icon.width = 10;
+  delete_icon.height = 10;
 
   // Add the event handlers.
   completion_box.addEventListener("click", handle_task_complete_clicked);
   task_box.addEventListener("click", handle_task_edit_clicked);
+  delete_icon.addEventListener("click", handle_task_delete_clicked);
 
   // Apply CSS styling.
   task_box.classList.add("task-block");
+  delete_container.className = "hover-icon";
 
   // Set up the completition checkbox.
   completion_box.type = "checkbox";
@@ -297,6 +385,7 @@ function build_task_block(task_id, title, complete) {
 
   // Set the task ID.
   task_box.dataset['task'] = task_id;
+  task_box.id = `task-${task_id}`;
 
   return task_box;
 
@@ -344,14 +433,9 @@ function handle_initial_socket_connection() {
 // Updates the task board in response to the websocket.
 function handle_socket_update(message) {
 
-  console.log(message);
-
   const data = JSON.parse(message['data']);
   const activity = data['activity'];
   const type = data['type'];
-
-  console.log(activity);
-  console.log(type);
 
   // Separate the request into the activitiy.
   if (data['activity'] == "CREATE") {
@@ -364,6 +448,12 @@ function handle_socket_update(message) {
 
     } else if (data['type'] == "TASK") {
 
+      // Create the task block.
+      const task_block = build_task_block(data['data']['id'], data['data']['title'], data['data']['completed']);
+
+      // Append the task block to the group.
+      document.querySelector(`[data-group=\"${data['data']['group']}\"]`).querySelector(".element-list").append(task_block);
+
     }
 
   } else if (data['activity'] == "UPDATE") {
@@ -371,7 +461,34 @@ function handle_socket_update(message) {
     // Separate further into the type.
     if (data['type'] == "GROUP") {
 
+      // Get the specified group.
+      const group_box = document.querySelector(`[data-group="${data['data']['id']}"]`);
+
+      // Update the title of the group.
+      group_box.querySelector(".left-right-container").querySelector("div").textContent = data['data']['title'];
+
     } else if (data['type'] == "TASK") {
+
+      // Get the task block.
+      let task_block = document.getElementById(`task-${data['data']['id']}`);
+
+      // Determine if the group that the task block exists within is the appropriate group.
+      if (task_block.parentElement.parentElement.dataset['group'] != data['data']['group']) {
+
+        // Remove the task from the specified group.
+        task_block.parentElement.removeChild(task_block);
+
+        // Append the task block to the appropriate group.
+        const group_box = document.querySelector(`[data-group="${data['data']['group']}"]`);
+        group_box.append(task_block);
+
+      }
+
+      // Update the title of the task.
+      task_block.querySelector("span").textContent = data['data']['title'];
+
+      // Update the completion status.
+      change_state_of_task_block(task_block, data['data']['complete']);
 
     }
 
@@ -380,7 +497,19 @@ function handle_socket_update(message) {
     // Separate further into the type.
     if (data['type'] == "GROUP") {
 
+      // Find the group block.
+      const group_block = document.querySelector(`[data-group="${data['id']}"]`);
+
+      // Remove the group block.
+      group_block.remove();
+
     } else if (data['type'] == "TASK") {
+
+      // Find the task block.
+      const task_block = document.getElementById(`task-${data['id']}`);
+
+      // Remove the task block.
+      task_block.remove();
 
     }
 
@@ -396,7 +525,7 @@ function handle_socket_update(message) {
 function handle_new_task_button_pressed(event) {
 
   // Declare variables.
-  const group_id = event.currentTarget.parentElement.parentElement.dataset['group'];
+  const group_id = event.currentTarget.parentElement.parentElement.parentElement.dataset['group'];
   const group_id_box = document.getElementById("group-id-field");
   const dialog = document.getElementById("new-task-dialog");
   const title_field = document.getElementById("new-task-title-field");
@@ -413,6 +542,28 @@ function handle_new_task_button_pressed(event) {
 
   // Display the dialog.
   dialog.showModal();
+
+}
+
+// Deletes the selected group.
+function handle_group_delete_button_pressed(event) {
+
+  // Obtain the group id.
+  const id = event.currentTarget.parentElement.parentElement.parentElement.dataset['group'];
+
+  // Request that the server deletes the group.
+  fetch (`http://localhost:8000/group/delete/${id}`)
+  .then(response => {
+
+    // Send the deletion information to the websocket server.
+    connection.send(JSON.stringify({
+      'activity': "DELETE",
+      'type': "GROUP",
+      'id': id
+    }));
+
+  });
+
 
 }
 

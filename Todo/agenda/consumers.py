@@ -65,10 +65,8 @@ class UserConsumer(WebsocketConsumer):
         self.handle_task_update(data)
       elif (data['activity'] == "UPDATE" and data['type'] == "GROUP"):
         self.handle_group_update(data)
-      elif (data['activity'] == "DELETE" and data['type'] == "TASK"):
-        self.handle_task_delete(data)
-      elif (data['activity'] == "DELETE" and data['type'] == "GROUP"):
-        self.handle_group_delete(data)
+      elif (data['activity'] == "DELETE"):
+        self.handle_delete(data)
       else:
 
         self.send(JSONEncoder().encode({
@@ -128,12 +126,12 @@ class UserConsumer(WebsocketConsumer):
         'activity': "CREATE",
         'type': "TASK",
         'data': {
-        'title': task.title,
-        'id': task.id,
-        'description': task.description,
-        'due_date': due_date,
-        'group': None if task.group == None else task.group.id,
-        'complete': task.completion_status
+          'title': task.title,
+          'id': task.id,
+          'description': task.description,
+          'due_date': due_date,
+          'group': task.group.id,
+          'complete': task.completion_status
       }})
     })
     
@@ -182,13 +180,18 @@ class UserConsumer(WebsocketConsumer):
         'description': task.description,
         'due_date': due_date,
         'complete': task.completion_status,
-        'group': None if task.group == None else task.group.id
+        'group': task.group.id
       }
     })})
 
-  def handle_task_delete(self, data):
+  def handle_delete(self, data):
     '''Handles task deletion requests'''
-    print("User deleted object.")
+    
+    # Send the delete request to all users.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode(data)
+    })
 
   def handle_group_creation(self, data):
     '''Handles group creation requests.'''
@@ -271,12 +274,12 @@ class UserConsumer(WebsocketConsumer):
       'message': JSONEncoder().encode({
         'activity': "UPDATE",
         'type': "GROUP",
-        'title': group.title
+        'data': {
+          'id': group.id,
+          'title': group.title
+        }
       })
     })
-
-  def handle_group_delete(self, data):
-    '''Handles group deletion requests.'''
 
 
   def relay(self, event):

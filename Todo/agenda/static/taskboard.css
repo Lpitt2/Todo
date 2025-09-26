@@ -14,14 +14,12 @@
   border: 2px solid lightslategray;
   background-color: #cfcfcfff;
 
-  overflow: auto;
-
   margin: 8pt;
   padding: 12pt;
   padding-top: 0px;
   padding-bottom: 2pt;
 
-  width: 15%;
+  min-width: 25vh;
 
 }
 
@@ -33,11 +31,19 @@
 
 .task-block {
 
+  display: flex;
+  flex-direction: row;
+
+  justify-content: center;
+  justify-items: center;
+
   margin: 4pt;
   padding: 8pt;
 
   background-color: #7b7b7b;
   color: #bbbbbbff;
+
+  word-wrap: normal;
 
 }
 
@@ -52,5 +58,28 @@
 .title-field:focus {
 
   outline: none;
+
+}
+
+
+.hover-icon {
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  justify-items: center;
+  justify-self: center;
+
+  margin-left: auto;
+
+
+  opacity: 0;
+
+}
+
+.hover-icon:hover {
+
+  opacity: 1;
 
 }

@@ -299,3 +299,16 @@ button {
   color: #11dd11ff;
 
 }
+
+
+/* Addition button options. */
+
+
+button.stretch {
+
+  width: 80%;
+
+  margin-left: 10%;
+  margin-right: 10%;
+
+}
