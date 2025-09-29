@@ -497,12 +497,15 @@ function handle_socket_update(message) {
       let due_date = null;
       if (data['data']['due_date'] != null) {
 
-        due_date = new Date(data['data']['due_date']['year'], data['data']['due_date']['month'], data['data']['due_date']['day']);
+        due_date = new Date(data['data']['due_date']['year'], data['data']['due_date']['month'] - 1, data['data']['due_date']['day']);
 
       }
 
       // Create the task block.
       const task_block = build_task_block(data['data']['id'], data['data']['title'], data['data']['completed'], due_date);
+
+      // Style the task block.
+      style_task_block(task_block, data['data']['complete'], due_date);
 
       // Append the task block to the group.
       document.querySelector(`[data-group=\"${data['data']['group']}\"]`).querySelector(".element-list").append(task_block);
