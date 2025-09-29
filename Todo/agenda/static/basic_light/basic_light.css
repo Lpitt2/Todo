@@ -46,3 +46,11 @@ html > body
   padding: 14pt;
 
 }
+
+hr {
+
+  border: 1px solid black;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+
+}

@@ -3,7 +3,8 @@
 {% load static %}
 
 {% block metadata %}
-  <!--Place JavaScript tags here.-->
+  <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
+  <script type="text/javascript" src="{% static 'basic_light/compound/tab_panel.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -14,20 +15,27 @@
       
       <ul class="element-list">
 
-        
+        <li><button class="button-primary stretch open-dialog-button" data-target="create-group-dialog">Create New Group</button></li>
+
+        <hr/>
+
+        <div id="shared-groups-tab-list" data-group="shared-group-tab-panel" class="element-list tab-selector-bar"></div>
 
       </ul>
 
     </div>
 
-    <div class="layout-center-right">
-
-
-
-    </div>
+    <div class="layout-center-right tab-panel" id="shared-group-tab-panel"></div>
 
     <!--User Token-->
     <input type="hidden" value="{{ user_token }}" id="user_token">
+
+    <!--Create Group dialog.-->
+    <dialog closedBy="any" id="create-group-dialog">
+      <form>
+        <input type="text" placeholder="Name of Group"/>
+      </form>
+    </dialog>
 
   </div>
 
