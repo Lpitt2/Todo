@@ -71,34 +71,44 @@ The REST API is summerized below:
     <th>Purpose</th>
   </tr>
   <tr>
-    <td><code>/task/info/ID</code></td>
+    <td><code>/task/info/&lt;ID&gt;</code></td>
     <td>GET</td>
     <td>Returns the information pretaining to the specified task.</td>
   </tr>
   <tr>
-    <td><code>/task/edit/ID</code></td>
+    <td><code>/task/edit/&lt;ID&gt;</code></td>
     <td>PUT</td>
     <td>Updates the infomration of the specified task.</td>
   </tr>
   <tr>
-    <td><code>/task/delete/ID</code></td>
+    <td><code>/task/delete/&lt;ID&gt;</code></td>
     <td>GET</td>
     <td>Deletes the specified task.</td>
   </tr>
   <tr>
-    <td><code>/group/info/ID</code></td>
+    <td><code>/task/new</code></td>
+    <td>PUT</td>
+    <td>Creates a new task.</td>
+  </tr>
+  <tr>
+    <td><code>/group/info/&lt;ID&gt;</code></td>
     <td>GET</td>
     <td>Returns the information pretaining to the specified group.</td>
   </tr>
   <tr>
-    <td><code>/group/edit/ID</code></td>
+    <td><code>/group/edit/&lt;ID&gt;</code></td>
     <td>PUT</td>
     <td>Updates the information for the specified group.</td>
   </tr>
   <tr>
-    <td><code>/group/delete/ID</code></td>
+    <td><code>/group/delete/&lt;ID&gt;</code></td>
     <td>GET</td>
     <td>Deletes the specified group.</td>
+  </tr>
+  <tr>
+    <td><code>/group/new</code></td>
+    <td>PUT</td>
+    <td>Creates a new group.</td>
   </tr>
   <tr>
     <td><code>/user/tasks</code></td>
@@ -109,6 +119,36 @@ The REST API is summerized below:
     <td><code>/user/groups</code></td>
     <td>PUT</td>
     <td>Returns a list of all of the group IDs of the user.</td>
+  </tr>
+  <tr>
+    <td><code>/project/&lt;ID&gt;/task/new</code></td>
+    <td>PUT</td>
+    <td>Creates a new task for the specified project ID.</td>
+  </tr>
+  <tr>
+    <td><code>/project/&lt;ID&gt;/task/edit/&lt;task-ID&gt;</code></td>
+    <td>PUT</td>
+    <td>Updates task information for the specified project ID.</td>
+  </tr>
+  <tr>
+    <td><code>/project/&lt;ID&gt;/task/delete/&lt;task-ID&gt;</code></td>
+    <td>GET</td>
+    <td>Deletes a task within the specified project ID.</td>
+  </tr>
+  <tr>
+    <td><code>/project/&lt;ID&gt;/group/new</code></td>
+    <td>PUT</td>
+    <td>Creates a new group within the specified project ID.</td>
+  </tr>
+  <tr>
+    <td><code>/project/&lt;ID&gt;/group/edit/&lt;group-ID&gt;</code></td>
+    <td>PUT</td>
+    <td>Updates group information for the specified project ID.</td>
+  </tr>
+  <tr>
+    <td><code>/project/&lt;ID&gt;/group/delete/&lt;group-ID&gt;</code></td>
+    <td>GET</td>
+    <td>Deletes a group within the specified project ID.</td>
   </tr>
 </table>
 

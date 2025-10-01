@@ -190,7 +190,13 @@ class UserConsumer(WebsocketConsumer):
     # Send the delete request to all users.
     async_to_sync(self.channel_layer.group_send)(self.group_name, {
       'type': "relay",
-      'message': JSONEncoder().encode(data)
+      'message': JSONEncoder().encode({
+        'activity': data['activity'],
+        'type': data['type'],
+        'data': {
+          'id': data['id']
+        }
+      })
     })
 
   def handle_group_creation(self, data):
