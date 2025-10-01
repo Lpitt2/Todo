@@ -192,10 +192,11 @@ def user_task_info(request, user_token):
   data = {
     'tasks': [
       {
-      'title': task.title,
-      'group_id': (task.group.id if task.group != None else None),
-      'completed': task.completion_status,
       'id': task.id,
+      'title': task.title,
+      'description': task.description,
+      'group': (task.group.id if task.group != None else None),
+      'completed': task.completion_status
       } for task in tasks
     ] 
   }
@@ -399,7 +400,9 @@ def group_info(request, group_id):
       {
         'id': task.id,
         'title': task.title,
-        'completed': task.completion_status,
+        'description': task.description,
+        'group': (task.group.id if task.group != None else None),
+        'complete': task.completion_status,
         'due_date': None if task.due_date == None else {
           'year': task.due_date.year,
           'month': task.due_date.month,

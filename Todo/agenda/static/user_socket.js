@@ -1,4 +1,4 @@
-import { Task } from "./task.js";
+import { Task, build_task_from_json } from "./task.js";
 
 export class UserSocket extends WebSocket {
 
@@ -104,7 +104,7 @@ export class UserSocket extends WebSocket {
       if (activity == "CREATE") {
 
         // Build the task object.
-        const task = build_task_object_from_request(data);
+        const task = build_task_from_json(data);
 
         // Call the create task callback.
         this.#on_task_new(task);
@@ -112,7 +112,7 @@ export class UserSocket extends WebSocket {
       } else if (activity == "UPDATE") {
 
         // Build the task object.
-        const task = build_task_object_from_request(data);
+        const task = build_task_from_json(data);
 
         // Call the edit task callback.
         this.#on_task_edit(task);
@@ -149,28 +149,3 @@ export class UserSocket extends WebSocket {
   }
 
 };
-
-
-function build_task_object_from_request(data) {
-
-  // Declare task object.
-  const task = new Task(data['id']);
-  let due_date = null;
-
-  // Create the due date object.
-  if (data['due_date'] != null) {
-
-    due_date = new Date(data['due_date']['year'], data['due_date']['month'], data['due_date']['day']);
-
-  }
-
-  // Load the task information into the task object.
-  task.title = data['title'];
-  task.description = data['description'];
-  task.group = data['group'];
-  task.completed = data['complete'];
-  task.due_date = due_date;
-
-  return task;
-
-}

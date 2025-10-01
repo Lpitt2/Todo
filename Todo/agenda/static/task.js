@@ -25,3 +25,27 @@ export class Task {
   get group() { return this.#group; }
 
 };
+
+export function build_task_from_json(data) {
+
+  // Declare task object.
+  const task = new Task(data['id']);
+  let due_date = null;
+
+  // Create the due date object.
+  if (data['due_date'] != null) {
+
+    due_date = new Date(data['due_date']['year'], data['due_date']['month'], data['due_date']['day']);
+
+  }
+
+  // Load the task information into the task object.
+  task.title = data['title'];
+  task.description = data['description'];
+  task.group = data['group'];
+  task.completed = data['complete'];
+  task.due_date = due_date;
+
+  return task;
+
+}

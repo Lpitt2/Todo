@@ -162,11 +162,24 @@ export class Taskboard {
     // Get the task object.
     const task_box = this.#taskboard.querySelector(`[data-task="${task.id}"]`);
 
-    // Update the title to the new task.
-    task_box.title = task.title;
+    // Determine if the group has changed.
+    if (task_box.parentElement.parentElement.dataset['group'] != task.group) {
 
-    // Update the completion status.
-    style_task_block(task_box, task);
+      // Remove the task from the current group.
+      task_box.remove();
+
+      // Add the task to the proper group.
+      this.add_task(task);
+
+    } else {
+
+      // Update the title to the new task.
+      task_box.querySelector("span").innerHTML = task.title;
+
+      // Update the completion status.
+      style_task_block(task_box, task);
+
+    }
 
   }
 
@@ -228,10 +241,18 @@ export function style_task_block(task_block, task) {
   // Declare variables.
   let today = new Date();
 
+  // Normalize today month.
+  today.setMonth(today.getMonth() + 1);
+
+  // Ensure that the checkbox is inactive.
+  task_block.querySelector("input").checked = false;
+
   // Determine if the task block is completed.
   if (task.completed) {
 
     task_block.className = "completed-task";
+
+    task_block.querySelector("input").checked = true;
 
   } else if ((task.due_date == null) || (today.getFullYear() < task.due_date.getFullYear()) || (today.getFullYear() == task.due_date.getFullYear() && today.getMonth() < task.due_date.getMonth()) || (today.getFullYear() == task.due_date.getFullYear() && today.getMonth() == task.due_date.getMonth() && today.getDate() < task.due_date.getDate())) {
 
