@@ -11,30 +11,29 @@
   
 {% block content %}
 
-<div class="layout-body-split">
+<div class="left-right-container">
 
-  <div class="layout-left-body">
+  <h4 style="display: inline; margin: 3px; padding: 3px;">Dashboard</h4>
 
-    <ul class="element-list">
+  <div class="right-container">
 
-      <li><button class="open-dialog-button button-primary stretch" data-target="new-group-dialog">Create New Group</button></li>
-
-    </ul>
-
-  </div>
-
-  <div class="layout-center-right">
-
-    <ul class="horizontal-list element-list taskboard">
-
-    </ul>
-
-    <!--User Token-->
-    <input type="hidden" value="{{ user_token }}" id="user_token">
+    <button class="open-dialog-button button-primary" data-target="new-group-dialog">Create New Group</button>
 
   </div>
 
 </div>
+
+<div class="layout-center-right"> 
+
+  <ul class="horizontal-list element-list taskboard">
+
+  </ul>
+
+  <!--User Token-->
+  <input type="hidden" value="{{ user_token }}" id="user_token">
+
+</div>
+
 
 <!--New Task dialog-->
 <dialog closedBy="any" id="new-task-dialog">

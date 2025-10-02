@@ -487,3 +487,96 @@ def group_new(request):
   return JsonResponse({
     'id': group.id
   })
+
+
+# Common Board API.
+
+
+def shared_info(request, id):
+  '''API to report information about the requested common group.'''
+
+  # Verify that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+
+  # Attempt to find the common board.
+  common_group = get_object_or_404(CommonBoard, pk=id)
+
+  # Ensure that the user is within the owners of the common board.
+  if (not common_group.owners.all().filter(pk=request.user.id).exists()):
+    return HttpResponse(status=401)
+
+  return JsonResponse({
+    'id': common_group.id,
+    'title': common_group.title,
+    'groups': None if TaskGroup.objects.filter(common_board=common_group).count() == 0 else [{
+      'id': group.id,
+      'title': group.title
+    } for group in TaskGroup.objects.filter(common_board=common_group)],
+    'owners': [owner.username for owner in common_group.owners.all()]
+  })
+
+
+
+@require_http_methods(['PUT'])
+@csrf_exempt
+def shared_edit(request, id):
+  '''API to edit the requested common group.'''
+
+def shared_delete(request, id):
+  '''API to delete the requested common group.'''
+
+@require_http_methods(['PUT'])
+@csrf_exempt
+def shared_new(request, id):
+  '''API to create a new common group.'''
+
+  # Ensure that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+
+  # Create the common group.
+  common_group = CommonGroup()
+
+  # Extract the request information.
+  data = JSONDecoder().decode(request.body.decode('utf-8'))
+
+  # Ensure that the title is present.
+  if ('title' not in data):
+    return HttpResponse(status=400)
+
+  # Load the title information.
+  common_group.title = data['title']
+
+  # Save the common board.
+  common_group.save()
+
+  # Add the current user to the owners field.
+  common_group.owners.add(request.user)
+
+  # Load the users.
+  if ('users' in data and type(data['users']) != type(list())):
+    for user in data['users']:
+      
+      user = None
+
+      # Attempt to find the user.
+      try:
+
+        # Find the user by their username.
+        user = User.objects.get(username=user)
+
+        # Add the user to the common group.
+        common_group.owners.add(user)
+
+      except(User.DoesNotExist):
+
+        pass
+
+  # Save the common board.
+  common_group.save()
+
+  return JsonResponse({
+    'id': common_group.id
+  })
+

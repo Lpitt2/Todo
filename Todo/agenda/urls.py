@@ -24,7 +24,12 @@ urlpatterns = [
   path("group/info/<int:group_id>", views.group_info, name="group-info"),
   path("group/edit/<int:group_id>", views.group_edit, name="group-edit"),
   path("group/delete/<int:group_id>", views.group_delete, name="group-delete"),
-  path("group/new", views.group_new, name="group-new")
+  path("group/new", views.group_new, name="group-new"),
+
+  path("shared/info/<int:id>", views.shared_info, name="shared-info"),
+  path("shared/edit/<int:id>", views.shared_edit, name="shared-edit"),
+  path("shared/delete/<int:id>", views.shared_delete, name="shared-delete"),
+  path("shared/new", views.shared_new, name="shared-new")
 ]
 
 

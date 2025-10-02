@@ -5,6 +5,7 @@
 {% block metadata %}
   <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
   <script type="text/javascript" src="{% static 'basic_light/compound/tab_panel.js' %}"></script>
+  <script type="module" src="{% static 'controllers/commonboard.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -15,7 +16,7 @@
       
       <ul class="element-list">
 
-        <li><button class="button-primary stretch open-dialog-button" data-target="create-group-dialog">Create New Group</button></li>
+        <li><button class="button-primary stretch open-dialog-button" data-target="create-group-dialog">Create New Common Board</button></li>
 
         <hr/>
 
@@ -33,7 +34,20 @@
     <!--Create Group dialog.-->
     <dialog closedBy="any" id="create-group-dialog">
       <form>
-        <input type="text" placeholder="Name of Group"/>
+
+        <div style="margin: 10pt;">
+          <input type="text" placeholder="Name of Board"/>
+        </div>
+
+        <div style="margin: 10pt;">
+          <ul class="element-list" id="shared_list"></ul>
+          <input type="text" placeholder="Share With" id="shared_field"/>
+        </div>
+
+        <div>
+          <button class="button-accept">Create Board</button>
+        </div>
+
       </form>
     </dialog>
 

@@ -169,6 +169,12 @@ will send the update notice to all other user sessions under the same account to
 
 ---
 
+### Database Schema
+
+![Entity Relationship diagram for Agenda](ER.png)
+
+---
+
 ### Styling
 
 The CSS code was written for this project and takes inspiration from Bootstrap. The CSS 
@@ -176,3 +182,43 @@ styling includes styling for HTML elements, as well as compound elements and pag
 Compound elements are those that are comprised of HTML elements (e.g., button groups). Any
 additional scripting needed for them will be implemented in JavaScript files located in the
 _/static/basic_light/compound/_ folder.
+
+---
+
+### Taskboard and Client Side Code
+
+The client side code is written in traditional JavaScript using elements that are cross platform and
+are not depreciated. Generally, this code should work on any modern HTML5 complient browser, but is
+tested on Firefox and Brave. The client side code mainly uses JavaScript modules to provide a modern
+and clean organizational structure. The term _Controller_ is used to denote that those JavaScript files
+exist to provide driver code for specific web pages. A driver only contains code that will be used 
+exclusively on one web page. The table below associated the driver files with their web pages.
+
+<table>
+  <tr>
+    <th>Driver Name</th>
+    <th>URL</th>
+  </tr>
+  <tr>
+    <td>dashboard.js</td>
+    <td><code>/home</code></td>
+  </tr>
+  <tr>
+    <td>shareboard.js</td>
+    <td>
+      <code>/shared</code>    
+    </td>
+  </tr>
+</table>
+
+The modules include taskboard, user_socket, and task. The _task_ module contains utilities for representing,
+and extracting, tasks within the client code. The _taskboard_ module contains the taskboard class which 
+handles all UI operations for the taskboard. These include adding groups or tasks to the taskboard. Note that
+taskboard does not contain functionallity that communicates with the server or web socket. It does provide
+hooks that will be executed when certain events occur (e.g., user clicks new task button or user clicks the
+task to edit it). The _user socket_ module handles communication with the web socket server. This includes
+the initial connection and handling requests. As with the taskboard class, the UserSocket class has hooks for
+events that occur in response to information received from the web socket server.
+
+Note that the code contained in the taskboard module needs to be accompanied by the "taskboard.css" file.
+

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class UserRegistration:
 
-  tokens = {'0': User.objects.get(pk=1)}
+  tokens = dict()
 
   def register_user(self, user):
     '''Generates a token for the user.'''
