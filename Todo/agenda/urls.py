@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 from . import consumers
@@ -6,7 +6,7 @@ from . import consumers
 urlpatterns = [
   path("", views.index_view, name="index"),
   path("home", views.home_view, name="home"),
-  path("shared", views.shared_view, name="shared"),
+  path("shared/<int:id>", views.shared_view, name="shared"),
   path("login", views.login_view, name="login"),
   path("register", views.register_view, name="register"),
 
@@ -34,5 +34,6 @@ urlpatterns = [
 
 
 websocket_urls = [
-  path('sockets/user', consumers.UserConsumer.as_asgi())
+  path('sockets/user', consumers.UserConsumer.as_asgi()),
+  path('sockets/common', consumers.CommonComumer.as_asgi())
 ]

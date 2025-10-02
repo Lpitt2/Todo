@@ -142,8 +142,8 @@ def home_view(request):
 
 
 @login_required(login_url="/login")
-def shared_view(request):
-  ''''''
+def shared_view(request, id):
+  '''Displays the user's common board page.'''
 
   # Extract the user.
   user = request.user
@@ -151,7 +151,21 @@ def shared_view(request):
   # Ensure that the user is registered.
   token = registration.register_user(request.user)
 
-  return render(request, "agenda/shared_dashboard.html", {'user_token': token})
+  # Get all common boards for the user.
+  user_boards = [board for board in user.commonboard_set.all()]
+
+  # Determine if the user is seeking a generic page.
+  if (id == 0):
+    return render(request, "agenda/shared_dashboard.html", {'user_token': token, 'user_boards': user_boards})
+
+  # Attempt to find the requested common board.
+  common_group = get_object_or_404(CommonBoard, pk=id)
+
+  # Verify that the user is within the owners of the board.
+  if (not common_group.owners.all().filter(pk=request.user.id).exists()):
+    return HttpResponse(status=401)
+
+  return render(request, "agenda/shared_commonboard.html", {'user_token': token, 'user_boards': user_boards, 'common_board_id': common_group.id})
 
 
 # API Requests.
@@ -523,8 +537,10 @@ def shared_info(request, id):
 def shared_edit(request, id):
   '''API to edit the requested common group.'''
 
+
 def shared_delete(request, id):
   '''API to delete the requested common group.'''
+
 
 @require_http_methods(['PUT'])
 @csrf_exempt

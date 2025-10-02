@@ -158,7 +158,7 @@ features. The Websocket implementation was designed to incorperate the REST API.
 API's methods are not called in this project but left to allow for extending the application
 at a later date. There are two consumers (websocket classes) that are used. The first is 
 called __UserConsumer__ and it ensures that multiple sessions for the same user are up-to-date
-and consistent. The second consumer is called __GroupConsumer__ and it manages the multi-user
+and consistent. The second consumer is called __CommonConsumer__ and it manages the multi-user
 groups that facilitate the collaborative features.
 
 The __UserConsumer__ connects all sessions for the same user together and ensures that they 
@@ -166,6 +166,13 @@ are updated to be in sync with each other. When a user visits a page with voliti
 information that can be updated at a moment's notice) then they connect to the websocket server
 and are assigned to a group for their user only. If the user updates information the websocket
 will send the update notice to all other user sessions under the same account to check for updates.
+
+The __CommonConsumer__ connects all users for a specific common board group together. Each common 
+group gets a single consumer instance. If a given user has five common group boards then they will
+have a single consumer instance for __UserConsumer__ and five instances for __CommonConsumer__. In
+this scenario, each __CommonConsumer__ instance handles the communication for that specific common
+group rather than tailor its support to the user. Because of this, the __CommonConsumer__ will work
+with a single taskboard object in the client code.
 
 ---
 

@@ -298,7 +298,7 @@ class UserConsumer(WebsocketConsumer):
     self.send(text_data=message)
 
 
-class ProjectConsumer(WebsocketConsumer):
+class CommonComumer(WebsocketConsumer):
 
   def connect(self):
     self.accept()

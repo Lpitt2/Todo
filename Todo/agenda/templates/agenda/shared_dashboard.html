@@ -4,39 +4,44 @@
 
 {% block metadata %}
   <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
-  <script type="text/javascript" src="{% static 'basic_light/compound/tab_panel.js' %}"></script>
-  <script type="module" src="{% static 'controllers/commonboard.js' %}"></script>
+  <script type="module" src="{% static 'controllers/commonboard_page.js' %}"></script>
+
+  <link rel="stylesheet" href="{% static 'taskboard.css' %}">
 {% endblock %}
 
 {% block content %}
 
   <div class="layout-body-split">
 
-    <div class="layout-left-body">
-      
-      <ul class="element-list">
+    <ul class="layout-left-body element-list">
 
-        <li><button class="button-primary stretch open-dialog-button" data-target="create-group-dialog">Create New Common Board</button></li>
+      <li><button class="button-primary open-dialog-button stretch" data-target="create-common-group-dialog">Create New Common Group</button></li>
 
-        <hr/>
+      <hr/>
 
-        <div id="shared-groups-tab-list" data-group="shared-group-tab-panel" class="element-list tab-selector-bar"></div>
+      {% for group in user_boards %}
 
-      </ul>
+      <li><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a></li>
+
+      {% endfor %}
+
+    </ul>
+
+    <div class="layout-center-right">
+
+      {% block taskboard %}{% endblock %}
 
     </div>
-
-    <div class="layout-center-right tab-panel" id="shared-group-tab-panel"></div>
 
     <!--User Token-->
     <input type="hidden" value="{{ user_token }}" id="user_token">
 
-    <!--Create Group dialog.-->
-    <dialog closedBy="any" id="create-group-dialog">
+    <!--Create Common Group dialog.-->
+    <dialog closedBy="any" id="create-common-group-dialog">
       <form>
 
         <div style="margin: 10pt;">
-          <input type="text" placeholder="Name of Board"/>
+          <input type="text" placeholder="Name of Board" id="shared_board_name_field"/>
         </div>
 
         <div style="margin: 10pt;">
@@ -50,6 +55,8 @@
 
       </form>
     </dialog>
+
+    {% block dialogs %}{% endblock %}
 
   </div>
 
