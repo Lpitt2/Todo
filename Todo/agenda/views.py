@@ -15,6 +15,9 @@ from .users import UserRegistration
 registration = UserRegistration()
 
 
+
+
+
 # Page Requests.
 
 
@@ -162,10 +165,13 @@ def shared_view(request, id):
   common_group = get_object_or_404(CommonBoard, pk=id)
 
   # Verify that the user is within the owners of the board.
-  if (not common_group.owners.all().filter(pk=request.user.id).exists()):
+  if (not common_group.user_authorized(user)):
     return HttpResponse(status=401)
 
   return render(request, "agenda/shared_commonboard.html", {'user_token': token, 'user_boards': user_boards, 'common_board_id': common_group.id})
+
+
+
 
 
 # API Requests.
@@ -390,6 +396,9 @@ def task_new(request):
   return JsonResponse(data)
 
 
+
+
+
 # Group API.
 
 
@@ -503,6 +512,9 @@ def group_new(request):
   })
 
 
+
+
+
 # Common Board API.
 
 
@@ -517,7 +529,7 @@ def shared_info(request, id):
   common_group = get_object_or_404(CommonBoard, pk=id)
 
   # Ensure that the user is within the owners of the common board.
-  if (not common_group.owners.all().filter(pk=request.user.id).exists()):
+  if (not common_group.user_authorized(user)):
     return HttpResponse(status=401)
 
   return JsonResponse({
@@ -531,15 +543,46 @@ def shared_info(request, id):
   })
 
 
-
 @require_http_methods(['PUT'])
 @csrf_exempt
 def shared_edit(request, id):
-  '''API to edit the requested common group.'''
+  '''API to edit the requested common board.'''
 
+  # Attempt to find the common board object.
+  common_board = get_object_or_404(CommonBoard, pk=id)
 
-def shared_delete(request, id):
-  '''API to delete the requested common group.'''
+  # Extract the information from the request.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Ensure that the user is one of the owners of the common board.
+  if (not common_board.user_authorized(request.user)):
+    return HttpResponse(status=403)
+
+  # Determine if the title is present.
+  if ('title' in data):
+
+    common_board.title = data['title']
+
+  # Determine if a user is added to the common board.
+  if ('new-user' in data):
+
+    # Add the user to the owners of the common board.
+    common_board.owners.add(get_object_or_404(User, username=data['new-user']))
+
+  # Determine if a user was removed from the common board.
+  if ('remove-user' in data):
+
+    # Remove the user from the owners of the common board.
+    common_board.owners.remove(get_object_or_404(User, username=data['remove-user']))
+
+  # Save the common board.
+  common_board.save()
+
+  return JsonResponse({
+    'id': common_board.id,
+    'title': common_board.title,
+    'users': [user.username for user in common_board.owners.all()]
+  })
 
 
 @require_http_methods(['PUT'])
@@ -595,4 +638,3 @@ def shared_new(request, id):
   return JsonResponse({
     'id': common_group.id
   })
-

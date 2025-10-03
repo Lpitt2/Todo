@@ -232,7 +232,7 @@ async function handle_edit_task_taskboard(event) {
     option.textContent = group['title'];
 
     // Determine if the current group is the active group for the task.
-    if (group['id'] == current_group_id) {
+    if (group['id'] === current_group_id) {
 
       option.selected = true;
 

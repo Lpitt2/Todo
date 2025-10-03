@@ -1,4 +1,4 @@
-import { Task, build_task_from_json } from "./task.js";
+import { build_task_from_json } from "./task.js";
 
 export class UserSocket extends WebSocket {
 
@@ -23,7 +23,7 @@ export class UserSocket extends WebSocket {
   #on_group_new = (group_id, group_title) => {};
   #on_group_edit = (group_id, group_title) => {};
   #on_group_delete = (group_id) => {};
-  #on_error = (status, message) => {};
+  #on_error = (status, message) => { console.log(`Error (${status}) - ${message}`)};
 
 
   constructor(url, user_token) {
@@ -39,7 +39,7 @@ export class UserSocket extends WebSocket {
   }
 
 
-  /* Setters */
+  /* Accessor Methods. */
 
 
   set on_task_new(on_task_new) { this.#on_task_new = on_task_new; }
@@ -49,6 +49,8 @@ export class UserSocket extends WebSocket {
   set on_group_edit(on_group_edit) { this.#on_group_edit = on_group_edit; }
   set on_group_delete(on_group_delete) { this.#on_group_delete = on_group_delete; }
   set on_error(on_error) { this.#on_error = on_error; }
+
+  get user_token() { return this.#user_token; }
 
 
   /* Handles user requests to the web socket server. */
@@ -68,7 +70,7 @@ export class UserSocket extends WebSocket {
   /* Web Socket Event Handlers. */
 
   
-  #handle_init_connection = (event) => {
+  #handle_init_connection(event) {
 
     this.send(JSON.stringify({
       'user-token': this.#user_token
@@ -98,10 +100,10 @@ export class UserSocket extends WebSocket {
     const type = raw_message['type'];
 
     // Determine the request type.
-    if (type == "TASK") {
+    if (type === "TASK") {
 
       // Determine the request.
-      if (activity == "CREATE") {
+      if (activity === "CREATE") {
 
         // Build the task object.
         const task = build_task_from_json(data);
@@ -109,7 +111,7 @@ export class UserSocket extends WebSocket {
         // Call the create task callback.
         this.#on_task_new(task);
 
-      } else if (activity == "UPDATE") {
+      } else if (activity === "UPDATE") {
 
         // Build the task object.
         const task = build_task_from_json(data);
@@ -117,27 +119,27 @@ export class UserSocket extends WebSocket {
         // Call the edit task callback.
         this.#on_task_edit(task);
 
-      } else if (activity == "DELETE") {
+      } else if (activity === "DELETE") {
 
         // Call the delete task callback.
         this.#on_task_delete(data['id'])
 
       }
 
-    } else if (type == "GROUP") {
+    } else if (type === "GROUP") {
 
       // Determine the request.
-      if (activity == "CREATE") {
+      if (activity === "CREATE") {
 
         // Call the group new callback.
         this.#on_group_new(data['id'], data['title']);
 
-      } else if (activity == "UPDATE") {
+      } else if (activity === "UPDATE") {
 
         // Call the group edit callback.
         this.#on_group_edit(data['id'], data['title']);
 
-      } else if (activity == "DELETE") {
+      } else if (activity === "DELETE") {
 
         // Call the group delete callback.
         this.#on_group_delete(data['id']);
@@ -148,4 +150,27 @@ export class UserSocket extends WebSocket {
 
   }
 
-};
+}
+
+export class CommonSocket extends UserSocket {
+
+  #common_id = null;
+
+  constructor(url, user_token, common_id) {
+
+    super(url, user_token);
+
+    this.#common_id = common_id;
+
+  }
+
+  #handle_init_connection(event) {
+
+    this.send(JSON.stringify({
+      'user-token': this.user_token,
+      'id': this.#common_id
+    }));
+
+  }
+
+}

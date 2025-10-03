@@ -3,11 +3,13 @@ from asgiref.sync import async_to_sync
 from json import JSONDecoder, JSONEncoder
 from .users import UserRegistration
 from .models import *
+from typing import TypeVar, Generic
 
 
 # Declare singletons.
 registration = UserRegistration()
 
+T = TypeVar('T')
 
 class UserConsumer(WebsocketConsumer):
 
@@ -111,13 +113,6 @@ class UserConsumer(WebsocketConsumer):
       }))
 
       return
-      
-    # Set up the due date information.
-    due_date = None if task.due_date == None else {
-      'month': task.due_date.month,
-      'year': task.due_date.year,
-      'day': task.due_date.day
-    }
 
     # Send the new task information to all users within the group.
     async_to_sync(self.channel_layer.group_send)(self.group_name, {
@@ -125,14 +120,7 @@ class UserConsumer(WebsocketConsumer):
       'message': JSONEncoder().encode({
         'activity': "CREATE",
         'type': "TASK",
-        'data': {
-          'title': task.title,
-          'id': task.id,
-          'description': task.description,
-          'due_date': due_date,
-          'group': task.group.id,
-          'complete': task.completion_status
-      }})
+        'data': task.get_task_as_dictionary()})
     })
     
   def handle_task_update(self, data):
@@ -161,27 +149,13 @@ class UserConsumer(WebsocketConsumer):
         'message': f"User does not have ownership of task {data['id']}"
       }))
 
-    # Set up the due date information.
-    due_date = None if task.due_date == None else {
-      'month': task.due_date.month,
-      'year': task.due_date.year,
-      'day': task.due_date.day
-    }
-
     # Send the update information to all users within the group.
     async_to_sync(self.channel_layer.group_send)(self.group_name, {
       'type': "relay",
       'message': JSONEncoder().encode({
       'activity': "UPDATE",
       'type': "TASK",
-      'data': {
-        'id': task.id,
-        'title': task.title,
-        'description': task.description,
-        'due_date': due_date,
-        'complete': task.completion_status,
-        'group': task.group.id
-      }
+      'data': task.get_task_as_dictionary()
     })})
 
   def handle_delete(self, data):
@@ -235,10 +209,7 @@ class UserConsumer(WebsocketConsumer):
       'message': JSONEncoder().encode({
         'activity': "CREATE",
         'type': "GROUP",
-        'data': {
-          'id': group.id,
-          'title': group.title
-        }
+        'data': group.get_group_as_dictionary()
       })
     })
 
@@ -280,10 +251,7 @@ class UserConsumer(WebsocketConsumer):
       'message': JSONEncoder().encode({
         'activity': "UPDATE",
         'type': "GROUP",
-        'data': {
-          'id': group.id,
-          'title': group.title
-        }
+        'data': group.get_group_as_dictionary()
       })
     })
 
@@ -301,13 +269,282 @@ class UserConsumer(WebsocketConsumer):
 class CommonComumer(WebsocketConsumer):
 
   def connect(self):
+
+    # Set the group name.
+    self.group_name = None
+    self.common_board = None
+
     self.accept()
 
   def disconnect(self, close_code):
-    pass
+
+    # Determine if the socket is in a group.
+    if (self.group_name != None):
+
+      # Disconnect the user from the group.
+      async_to_sync(self.channel_layer.group_discard)(self.group_name, self.channel_name)
 
   def receive(self, text_data):
-    
-    print(text_data)
 
-    self.send(text_data=text_data)
+    # Convert the incomming data into a dictionary.
+    data = JSONDecoder().decode(text_data)
+
+    # Determine the type of the request.
+    if (self.group_name == None and 'user-token' in data):
+
+      # Handle the initial request.
+      self.handle_initial_communication(data)
+
+    elif (self.group_name == None):
+
+      self.send(text_data=JSONEncoder().encode({
+        'status': 412,
+        'message': 'User token and id are required before connection may be authorized.'
+      }))
+
+      return
+
+    # Ensure that the activity, type, and id attributes are present.
+    if ('activity' not in data or 'type' not in data or 'id' not in data):
+
+      # Send error message.
+      self.send_error(400, "Requires 'type', 'activity', and 'id' attributes.")
+
+      return
+
+    # Extract the data attributes.
+    activity = data['activity']
+    type = data['type']
+    id = data['id']
+
+    # Determine the request.
+    if (activity == "CREATE" and type == "TASK"):
+      self.handle_task_create(id)
+    elif (activity == "UPDATE" and type == "TASK"):
+      self.handle_task_update(id)
+    elif (activity == "CREATE" and type == "GROUP"):
+      self.handle_group_create(id)
+    elif (activity == "UPDATE" and type == "GROUP"):
+      self.handle_group_update(id)
+    elif (activity == "DELETE"):
+      self.handle_delete(data)
+    else:
+
+      # Send error message to the user.
+      self.send_error(400, "Invalid request.")
+
+
+  def send_error(self, code = 404, message = "Unable to find requested object."):
+    """Sends an error message to the user."""
+
+    self.send(JSONEncoder().encode({
+      'status': code,
+      'message': message
+    }))
+
+  def get_object_or_404(self, model : Generic[T], primary_key : int, message = "Unable to find object."):
+    """Retrieve the object from the model given the primary key."""
+
+    # Declare variables.
+    object = None
+
+    # Attempt to get the object from the request.
+    try:
+
+      object = model.objects.get(pk=primary_key)
+
+    except(model.DoesNotExist):
+
+        # Send error message.
+        self.send_error(message=message)
+
+    return object
+
+
+  def handle_initial_communication(self, message):
+    """Handles the initial communication."""
+
+    # Ensure that the user-token and id fields are present in the data.
+    if ('user-token' not in message or 'id' not in message):
+
+      # Send error message to the user.
+      self.send_error()
+
+      return
+
+    # Extract the data.
+    common_board_id = message['id']
+    user_token = message['user-token']
+
+    # Ensure that the user is valid.
+    if (not registration.is_token_valid(user_token)):
+
+      # Send error to the user.
+      self.send_error(message = f"Unable to verify user token.")
+
+      return
+
+    # Get the user from the registration system.
+    user = registration.get_user_from_token(user_token)
+
+    # Attempt to get the commonboard object.
+    self.common_board = self.get_object_or_404(CommonBoard, common_board_id)
+
+    # Determine if the common board was not found.
+    if (self.common_board == None):
+      return
+
+    # Verify that the user is one of the owners of the common board.
+    if (not self.common_board.user_authorized(user)):
+
+      # Send error message to the user.
+      self.send_error(401, f"User is not authorized to access common board id {common_board_id}")
+
+    # Set up the group name.
+    self.group_name = f"Common-Board-{common_board_id}"
+
+    # Connect to the group.
+    async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
+
+  def handle_group_create(self, id):
+    """Handles new group creation."""
+
+    # Get the group object.
+    group = self.get_object_or_404(TaskGroup, id, message=f"Unable to find group {id}.")
+
+    # Ensure that the group was found.
+    if (group == None):
+      return
+
+    # Verify that the group is within the common board.
+    if (group.common_board != self.common_board):
+
+      # Send an error to the user.
+      self.send_error(406, f"Group with id {id} does not exist within the common board {self.common_board.id}.")
+
+      return
+
+    # Replay to all users within the group about the new TaskGroup object.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': "CREATE",
+        'type': "GROUP",
+        'data': group.get_group_as_dictionary()
+      })
+    })
+
+  def handle_group_update(self, id):
+    """Handles group update."""
+
+    # Get the group object.
+    group = self.get_object_or_404(TaskGroup, id, message=f"Unable to find group {id}.")
+
+    # Determine if the group is null.
+    if (group == None):
+      return
+
+    # Verify that the group is within the common board.
+    if (group.common_board != self.common_board):
+
+      # Send an error to the user.
+      self.send_error(406, f"Group with id {id} does not exist within the common board {self.common_board.id}.")
+
+      return
+
+    # Send the update information to all users within the group.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': "UPDATE",
+        'type': "GROUP",
+        'data': group.get_group_as_dictionary()
+      })
+    })
+
+  def handle_delete(self, message):
+    """Handles group deletion."""
+
+    # Send the delete request to all users.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': message['activity'],
+        'type': message['type'],
+        'data': {
+          'id': message['id']
+        }
+      })
+    })
+
+  def handle_task_create(self, id):
+    """Handles new task creation."""
+
+    # Get the task object.
+    task = self.get_object_or_404(Task, id, f"Unable to find task {id}")
+
+    # Verify that the task was found.
+    if (task == None):
+      return
+
+    # Get the associated group from the task.
+    group = task.group
+
+    # Verify that the group is within the associated common board.
+    if (group.common_board != self.common_board):
+
+      # Send error message to the user.
+      self.send_error(406, f"Group with id {group.id} does not exist within the common board {self.common_board.id}")
+
+      return
+
+    # Send the new task information to all users within the group.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': "CREATE",
+        'type': "TASK",
+        'data': task.get_task_as_dictionary()
+      })
+    })
+
+  def handle_task_update(self, id):
+    """Handles task update."""
+
+    # Get the task object.
+    task = self.get_object_or_404(Task, id, f"Unable to find task {id}")
+
+    # Verify that the task was found.
+    if (task == None):
+      return
+
+    # Get the associated group from the task.
+    group = task.group
+
+    # Verify that the group is within the associated common board.
+    if (group.common_board != self.common_board):
+
+      # Send error message to the user.
+      self.send_error(406, f"Group with id {group.id} does not exist within the common board {self.common_board.id}")
+
+      return
+
+    # Send the update information to all users within the group.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': "UPDATE",
+        'type': "TASK",
+        'data': task.get_task_as_dictionary()
+      })
+    })
+
+
+  def relay(self, event):
+    """Relays the information to each user within the group."""
+
+    # Extract the message from the event.
+    message = event['message']
+
+    # Send the message on to the current user.
+    self.send(text_data=message)

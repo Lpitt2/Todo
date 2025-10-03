@@ -4,7 +4,7 @@
 
 {% block metadata %}
   <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
-  <script type="module" src="{% static 'controllers/commonboard_page.js' %}"></script>
+  <script type="module" src="{% static 'controllers/commonboard_dashboard_page.js' %}"></script>
 
   <link rel="stylesheet" href="{% static 'taskboard.css' %}">
 {% endblock %}
@@ -21,7 +21,7 @@
 
       {% for group in user_boards %}
 
-      <li><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a></li>
+      <li><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a><img class="common-board-leave-button" width="10" height="10" src="{% static 'icons/delete.svg' %}"></li>
 
       {% endfor %}
 
@@ -38,10 +38,10 @@
 
     <!--Create Common Group dialog.-->
     <dialog closedBy="any" id="create-common-group-dialog">
-      <form>
+      <form id="create-common-group-form">
 
         <div style="margin: 10pt;">
-          <input type="text" placeholder="Name of Board" id="shared_board_name_field"/>
+          <input type="text" placeholder="Name of Board" id="common_group_name_field"/>
         </div>
 
         <div style="margin: 10pt;">
