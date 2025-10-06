@@ -13,7 +13,7 @@
 
   <div class="layout-body-split">
 
-    <ul class="layout-left-body element-list">
+    <ul class="layout-left-body element-list" id="common_board_list">
 
       <li><button class="button-primary open-dialog-button stretch" data-target="create-common-group-dialog">Create New Common Group</button></li>
 
@@ -21,7 +21,7 @@
 
       {% for group in user_boards %}
 
-      <li><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a><img class="common-board-leave-button" width="10" height="10" src="{% static 'icons/delete.svg' %}"></li>
+      <li data-commonboard="{{ group.id }}"><span class="button-group-row"><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a><button class="button-warning common-board-leave-button"><img width="10" height="10" src="{% static 'icons/delete.svg' %}"></button></span></li>
 
       {% endfor %}
 
@@ -45,8 +45,8 @@
         </div>
 
         <div style="margin: 10pt;">
-          <ul class="element-list" id="shared_list"></ul>
-          <input type="text" placeholder="Share With" id="shared_field"/>
+          <ul class="element-list" id="share_users_list"></ul>
+          <input type="email" placeholder="Share With" id="share_name_field"/>
         </div>
 
         <div>

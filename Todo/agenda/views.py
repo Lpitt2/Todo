@@ -529,7 +529,7 @@ def shared_info(request, id):
   common_group = get_object_or_404(CommonBoard, pk=id)
 
   # Ensure that the user is within the owners of the common board.
-  if (not common_group.user_authorized(user)):
+  if (not common_group.user_authorized(request.user)):
     return HttpResponse(status=401)
 
   return JsonResponse({
@@ -575,19 +575,33 @@ def shared_edit(request, id):
     # Remove the user from the owners of the common board.
     common_board.owners.remove(get_object_or_404(User, username=data['remove-user']))
 
-  # Save the common board.
-  common_board.save()
+  elif ('remove-self' in data):
 
-  return JsonResponse({
-    'id': common_board.id,
-    'title': common_board.title,
-    'users': [user.username for user in common_board.owners.all()]
-  })
+    # Remove the current user from the common board.
+    common_board.owners.remove(request.user)
+
+  # If the number of users within the common board is zero then delete the common board altogether.
+  if (common_board.owners.count() == 0):
+
+    # Delete the common board.
+    common_board.delete()
+
+  else:
+
+    common_board.save()
+
+    return JsonResponse({
+      'id': common_board.id,
+      'title': common_board.title,
+      'users': [user.username for user in common_board.owners.all()]
+    })
+
+  return HttpResponse(status=200)
 
 
 @require_http_methods(['PUT'])
 @csrf_exempt
-def shared_new(request, id):
+def shared_new(request):
   '''API to create a new common group.'''
 
   # Ensure that the user is logged in.
@@ -595,13 +609,13 @@ def shared_new(request, id):
     return HttpResponse(status=401)
 
   # Create the common group.
-  common_group = CommonGroup()
+  common_group = CommonBoard()
 
   # Extract the request information.
   data = JSONDecoder().decode(request.body.decode('utf-8'))
 
   # Ensure that the title is present.
-  if ('title' not in data):
+  if ('title' not in data or data['title'].strip() == ""):
     return HttpResponse(status=400)
 
   # Load the title information.
@@ -614,8 +628,8 @@ def shared_new(request, id):
   common_group.owners.add(request.user)
 
   # Load the users.
-  if ('users' in data and type(data['users']) != type(list())):
-    for user in data['users']:
+  if ('users' in data and type(data['users']) == type(list())):
+    for username in data['users']:
       
       user = None
 
@@ -623,7 +637,7 @@ def shared_new(request, id):
       try:
 
         # Find the user by their username.
-        user = User.objects.get(username=user)
+        user = User.objects.get(username=username)
 
         # Add the user to the common group.
         common_group.owners.add(user)
