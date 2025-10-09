@@ -1,8 +1,6 @@
 import { build_task_from_json } from "./task.js";
 
-export class UserSocket extends WebSocket {
-
-  #user_token = null;
+export class ISocket extends WebSocket {
 
   // Activity constants.
 
@@ -17,26 +15,29 @@ export class UserSocket extends WebSocket {
 
   // Event Handlers
 
-  #on_task_new = (task) => {};
-  #on_task_edit = (task) => {};
-  #on_task_delete = (task_id) => {};
-  #on_group_new = (group_id, group_title) => {};
-  #on_group_edit = (group_id, group_title) => {};
-  #on_group_delete = (group_id) => {};
-  #on_error = (status, message) => { console.log(`Error (${status}) - ${message}`)};
+  #on_task_new;
+  #on_task_edit;
+  #on_task_delete;
+  #on_group_new;
+  #on_group_edit;
+  #on_group_delete;
+  #on_error;
 
+  _user_token;
 
   constructor(url, user_token) {
 
-    // Set up the fields.
     super(url);
-    this.#user_token = user_token;
 
-    // Set the event handlers.
-    this.addEventListener("open", this.#handle_init_connection);
-    this.addEventListener("message", this.#handle_message);
+    this._user_token = user_token;
+
+    // Set the "handle message" method to the web socket.
+    this.addEventListener("message", this._handle_message);
 
   }
+
+
+
 
 
   /* Accessor Methods. */
@@ -50,7 +51,18 @@ export class UserSocket extends WebSocket {
   set on_group_delete(on_group_delete) { this.#on_group_delete = on_group_delete; }
   set on_error(on_error) { this.#on_error = on_error; }
 
-  get user_token() { return this.#user_token; }
+  get on_task_new() { return this.#on_task_new; }
+  get on_task_edit() { return this.#on_task_edit; }
+  get on_task_delete() { return this.#on_task_delete; }
+  get on_group_new() { return this.#on_group_new; }
+  get on_group_edit() { return this.#on_group_edit; }
+  get on_group_delete() { return this.#on_group_delete; }
+  get on_error() { return this.#on_error; }
+
+  get user_token() { return this._user_token; }
+
+
+  
 
 
   /* Handles user requests to the web socket server. */
@@ -67,18 +79,13 @@ export class UserSocket extends WebSocket {
   }
 
 
+
+
+
   /* Web Socket Event Handlers. */
 
-  
-  #handle_init_connection(event) {
 
-    this.send(JSON.stringify({
-      'user-token': this.#user_token
-    }));
-
-  }
-
-  #handle_message(message) {
+  _handle_message(message) {
 
     // Extract message information.
     const raw_message = JSON.parse(message['data']);
@@ -150,9 +157,38 @@ export class UserSocket extends WebSocket {
 
   }
 
-}
+};
 
-export class CommonSocket extends UserSocket {
+export class UserSocket extends ISocket {
+
+  constructor(url, user_token) {
+
+    // Set up the fields.
+    super(url, user_token);
+
+    // Set the event handlers.
+    this.addEventListener("open", this.#handle_init_connection);
+
+  }
+
+
+
+
+
+  /* Web Socket Event Handlers. */
+
+  
+  #handle_init_connection(event) {
+
+    this.send(JSON.stringify({
+      'user-token': this._user_token
+    }));
+
+  }
+
+};
+
+export class CommonSocket extends ISocket {
 
   #common_id = null;
 
@@ -162,15 +198,25 @@ export class CommonSocket extends UserSocket {
 
     this.#common_id = common_id;
 
+    // Set the event handlers.
+    this.addEventListener("open", this.#handle_init_connection);
+
   }
+
+
+
+
+
+  /* Web Socket Event Handlers. */
+
 
   #handle_init_connection(event) {
 
     this.send(JSON.stringify({
-      'user-token': this.user_token,
+      'user-token': this._user_token,
       'id': this.#common_id
     }));
 
   }
 
-}
+};

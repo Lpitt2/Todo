@@ -1,6 +1,3 @@
-import { Task } from "./task.js";
-
-
 // Manages the groups and task blocks.
 export class Taskboard {
 
@@ -64,12 +61,12 @@ export class Taskboard {
     title.addEventListener("focusout", this.#on_group_rename);
 
     // Set up the new task icon.
-    new_task_icon.src = "static/icons/plus.svg";
+    new_task_icon.src = "http://localhost:8000/static/icons/plus.svg";
     new_task_icon.width = 10;
     new_task_icon.height = 10;
 
     // Set up the delete group icon.
-    delete_group_icon.src = "static/icons/delete.svg";
+    delete_group_icon.src = "http://localhost:8000/static/icons/delete.svg";
     delete_group_icon.width = 10;
     delete_group_icon.height = 10;
 

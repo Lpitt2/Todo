@@ -295,6 +295,8 @@ class CommonComumer(WebsocketConsumer):
       # Handle the initial request.
       self.handle_initial_communication(data)
 
+      return
+
     elif (self.group_name == None):
 
       self.send(text_data=JSONEncoder().encode({

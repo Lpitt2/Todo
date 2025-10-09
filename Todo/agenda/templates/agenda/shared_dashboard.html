@@ -5,8 +5,10 @@
 {% block metadata %}
   <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
   <script type="module" src="{% static 'controllers/commonboard_dashboard_page.js' %}"></script>
-
   <link rel="stylesheet" href="{% static 'taskboard.css' %}">
+
+  {% block taskboard_metadata %}{% endblock %}
+
 {% endblock %}
 
 {% block content %}

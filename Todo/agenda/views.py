@@ -168,7 +168,7 @@ def shared_view(request, id):
   if (not common_group.user_authorized(user)):
     return HttpResponse(status=401)
 
-  return render(request, "agenda/shared_commonboard.html", {'user_token': token, 'user_boards': user_boards, 'common_board_id': common_group.id})
+  return render(request, "agenda/shared_commonboard.html", {'user_token': token, 'user_boards': user_boards, 'common_board': common_group})
 
 
 
@@ -185,7 +185,7 @@ def user_group_info(request):
     return HttpResponse(status=401)
 
   # Obtain the group information.
-  groups = TaskGroup.objects.filter(owner=request.user)
+  groups = TaskGroup.objects.filter(owner=request.user, common_board=None)
 
   data = {
     'groups': [
@@ -235,7 +235,7 @@ def task_info(request, task_id):
   task = get_object_or_404(Task, pk=task_id)
 
   # Ensure that the task is owned by the user.
-  if (task.owner != request.user):
+  if (not task.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Determine if the task has a due-date.
@@ -280,7 +280,7 @@ def task_edit(request, task_id):
   task = get_object_or_404(Task, pk=task_id)
 
   # Ensure that the task is owned by the user.
-  if (task.owner != request.user):
+  if (not task.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Decode the request.
@@ -297,6 +297,8 @@ def task_edit(request, task_id):
   # Update the due date if present.
   if (("due_date" in data) and (data['due_date'] != None) and ("year" in data['due_date']) and ("month" in data["due_date"]) and ("day" in data["due_date"])):
     task.due_date = date(data['due_date']['year'], data['due_date']['month'], data['due_date']['day'])
+  elif ("due_date" in data and data['due_date'] == None):
+    task.due_date = None
 
   # Update the completion status if present.
   if ("complete" in data):
@@ -309,7 +311,7 @@ def task_edit(request, task_id):
     group = get_object_or_404(TaskGroup, pk=data['group'])
 
     # Ensure that the group is owned by the user.
-    if (group.owner != request.user):
+    if (not group.user_authorized(request.user)):
       return HttpResponse(status=401)
     
     # Update the group to the task.
@@ -332,7 +334,7 @@ def task_delete(request, task_id):
   task = get_object_or_404(Task, pk=task_id)
 
   # Ensure that the user is the owner of the object.
-  if (task.owner != request.user):
+  if (not task.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Delete the task.
@@ -409,7 +411,7 @@ def group_info(request, group_id):
   group = get_object_or_404(TaskGroup, pk=group_id)
 
   # Ensure that the requesting user is the owner.
-  if (group.owner != request.user):
+  if (not group.user_authorized(request.user)):
     return HttpResponse(status=404)
   
   # Build the group information.
@@ -447,7 +449,7 @@ def group_edit(request, group_id):
   group = get_object_or_404(TaskGroup, pk=group_id)
 
   # Ensure that the group is owned by the requesting user.
-  if (request.user != group.owner):
+  if (not group.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Extract the JSON object.
@@ -470,7 +472,7 @@ def group_delete(request, group_id):
   group = get_object_or_404(TaskGroup, pk=group_id)
 
   # Ensure that the requesting user is the owner.
-  if (group.owner != request.user):
+  if (not group.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Delete the group object.
@@ -500,6 +502,15 @@ def group_new(request):
   
   # Assign the title to the group.
   group.title = data['title']
+
+  # Add the group to the proper common board if applicable.
+  if ("board" in data and data['board'] != None):
+
+    # Attempt to get the common board.
+    board = get_object_or_404(CommonBoard, pk=data['board'])
+
+    # Assign the current group to the common board.
+    group.common_board = board
 
   # Assign the owner to the group.
   group.owner = request.user

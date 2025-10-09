@@ -176,6 +176,183 @@ with a single taskboard object in the client code.
 
 ---
 
+### API Reference
+
+The API uses a REST design whereby JSON objects are sent from and to the web server. This section 
+describes the expected conventions when communicating with the various API endpoints. The API urls
+are presented in a table within the Design Considerations section.
+
+#### New Task (/task/new).
+<table>
+  <tr>
+    <th>Field Name</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>title</code></td>
+    <td>True</td>
+    <td>String</td>
+    <td>The title of the new task object.</td>
+  </tr>
+  <tr>
+    <td><code>group</code></td>
+    <td>True</td>
+    <td>Int</td>
+    <td>The id that the task is assigned under.</td>
+  </tr>
+  <tr>
+    <td><code>description</code></td>
+    <td>False</td>
+    <td>String</td>
+    <td>A short description of the new task object.</td>
+  </tr>
+  <tr>
+    <td><code>due_date</code></td>
+    <td>False</td>
+    <td>JSON</td>
+    <td>The due date of the new task object.</td>
+  </tr>
+</table>
+
+#### Edit Task (/task/edit/&lt;id&gt;).
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>title</code></td>
+    <td>False</td>
+    <td>String</td>
+    <td>The updated title of the task object.</td>
+  </tr>
+  <tr>
+    <td><code>group</code></td>
+    <td>False</td>
+    <td>Int</td>
+    <td>The group id of the new group that the task is assigned under.</td>
+  </tr>
+  <tr>
+    <td><code>description</code></td>
+    <td>False</td>
+    <td>String</td>
+    <td>The updated description string of the task object.</td>
+  </tr>
+  <tr>
+    <td><code>due_date</code></td>
+    <td>False</td>
+    <td>JSON</td>
+    <td>The updated due date for the task object.</td>
+  </tr>
+  <tr>
+    <td><code>complete</code></td>
+    <td>False</td>
+    <td>Boolean</td>
+    <td>The updated completion status of the task.</td>
+  </tr>
+</table>
+
+#### New Group (/group/new).
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>title</code></td>
+    <td>True</td>
+    <td>String</td>
+    <td>The title of the new group object.</td>
+  </tr>
+  <tr>
+    <td><code>board</code></td>
+    <td>False</td>
+    <td>Int</td>
+    <td>The id of the common board that the group is assigned under. If not present or null then the group is created under the user's personal taskboard.</td>
+  </tr>
+</table>
+
+#### Edit Group (/group/edit/&lt;id&gt;).
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>title</code></td>
+    <td>False</td>
+    <td>String</td>
+    <td>The updated title of the group object.</td>
+  </tr>
+</table>
+
+#### New Common Board (/shared/new).
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>title</code></td>
+    <td>True</td>
+    <td>String</td>
+    <td>The title of the new common board object.</td>
+  </tr>
+  <tr>
+    <td><code>users</code></td>
+    <td>False</td>
+    <td>Array</td>
+    <td>List of the users who are to be added to the group initially.</td>
+  </tr>
+</table>
+
+#### Edit Common Board (/shared/edit/&lt;id&gt;).
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>title</code></td>
+    <td>True</td>
+    <td>String</td>
+    <td>The title of the new common board object.</td>
+  </tr>
+  <tr>
+    <td><code>add-user</code></td>
+    <td>False</td>
+    <td>String</td>
+    <td>The username of a user to add to the common board object.</td>
+  </tr>
+  <tr>
+    <td><code>remove-user</code></td>
+    <td>False</td>
+    <td>String</td>
+    <td>The username of a user to remove from the common board object.</td>
+  </tr>
+  <tr>
+    <td><code>remove-self</code></td>
+    <td>False</td>
+    <td>String</td>
+    <td>Remove the requesting user from the common board object. This field may be null and will still perform its operation.</td>
+  </tr>
+</table>
+
+
+---
+
 ### Database Schema
 
 ![Entity Relationship diagram for Agenda](ER.png)

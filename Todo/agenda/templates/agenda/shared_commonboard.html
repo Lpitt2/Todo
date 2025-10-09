@@ -1,10 +1,138 @@
 {% extends './shared_dashboard.html' %}
 
+{% load static %}
+
+{% block taskboard_metadata %}
+  <script type="module" src="{% static 'controllers/commonboard_page.js' %}"></script>
+{% endblock %}
+
 {% block taskboard %}
+
+<div class="left-right-container">
+
+  <h4 style="display: inline; margin: 3px; padding: 3px;">{{ common_board.title }}</h4>
+
+  <div class="right-container">
+
+    <button class="open-dialog-button button-primary" data-target="new-group-dialog">Create New Group</button>
+
+  </div>
+
+</div>
+
+<ul class="horizontal-list element-list taskboard">
+
+</ul>
+
 {% endblock %}
 
 {% block dialogs %}
 
-<input type="hidden" value="{{ common_id }}" id="common_id">
+<input type="hidden" value="{{ common_board.id }}" id="common_id">
+
+<!--New Task dialog-->
+<dialog closedBy="any" id="new-task-dialog">
+    
+  <form id="new-task-form">
+
+    <span id="new-task-alert" style="color: red"></span>
+
+    <!--Title field-->
+    <div>
+
+      <input id="new-task-title-field" type="text" placeholder="Title" required>
+
+    </div>
+
+    <!--Description field-->
+    <div style="margin: 10pt;">
+
+      <div><label for="new-task-description-field">Description:</label></div>
+
+      <textarea id="new-task-description-field" rows="10" cols="60"></textarea>
+
+    </div>
+
+    <!--Due Date field-->
+    <div style="margin: 10pt;">
+
+      <input id="new-task-due-date-field" type="date">
+
+    </div>
+
+    <input type="hidden" id="group-id-field">
+
+    <button class="button-accept">Create Task</button>
+
+  </form>
+
+</dialog>
+
+<!--New Group dialog-->
+<dialog closedBy="any" id="new-group-dialog">
+
+  <form id="new-group-form">
+    
+    <!--Group name field-->
+    <div style="margin: 10pt;">
+
+      <input type="text" placeholder="Group Name" id="new-group-name-field"/>
+
+    </div>
+
+    <div>
+
+      <button class="button-accept">Create Group</button>
+
+    </div>
+
+  </form>
+
+</dialog>
+
+<!--Edit Task dialog-->
+<dialog closedBy="any" id="edit-task-dialog">
+
+  <form id="edit-task-form">
+
+    <!--Task Name field-->
+    <div>
+
+      <input type="text" placeholder="Title" id="edit-task-title-field" required/>
+
+    </div>
+
+    <!--Description field-->
+    <div style="margin: 10pt;">
+
+      <div><label for="new-task-description-field">Description:</label></div>
+
+      <textarea rows="10" cols="60" id="edit-task-description-field"></textarea>
+
+    </div>
+
+    <!--Group field-->
+    <div class="left-right-container" style="margin: 10pt;">
+
+      <label for="edit-group-field">Group:</label>
+
+      <select id="edit-task-group-field"></select>
+
+      <input class="right-container" type="date" id="edit-task-due-date-field"/>
+
+    </div>
+
+    <!--Task ID field-->
+    <input type="hidden" id="edit-task-id-field"/>
+
+    <div>
+
+      <button class="button-accept">Update Task</button>
+
+    </div>
+
+  </form>
+
+</dialog>
 
 {% endblock %}

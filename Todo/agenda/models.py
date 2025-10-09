@@ -28,6 +28,10 @@ class TaskGroup(models.Model):
   owner = models.ForeignKey(User, on_delete=models.DO_NOTHING)
   common_board = models.ForeignKey(CommonBoard, on_delete=models.DO_NOTHING, default=None, blank=True, null=True)
 
+  def user_authorized(self, user : User) -> bool:
+    """Determines if the specified user is one of the owners of the group."""
+    return ((self.owner == user) or (self.common_board != None and self.common_board.user_authorized(user)))
+
   def get_group_as_dictionary(self):
     """Returns a dictionary object containing the information for the group."""
 
@@ -49,6 +53,10 @@ class Task(models.Model):
   # Relationships.
   owner = models.ForeignKey(User, on_delete=models.CASCADE)
   group = models.ForeignKey(TaskGroup, on_delete=models.CASCADE)
+
+  def user_authorized(self, user : User) -> bool:
+    """Determines if the specified user is one of the owners of the task."""
+    return ((self.owner == user) or (self.group.user_authorized(user)))
 
   def get_task_as_dictionary(self):
     """Returns a JSON object of the task information."""
