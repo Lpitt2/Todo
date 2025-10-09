@@ -1,5 +1,5 @@
 import { Taskboard } from "../modules/taskboard.js";
-import { Task, build_task_from_json } from "../modules/task.js";
+import { build_task_from_json } from "../modules/task.js";
 import { CommonSocket } from "../modules/user_socket.js";
 import * as Driver from "../modules/taskboard_driver.js" ;
 
@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   connection.on_task_edit = Driver.handle_edit_task_socket;
   connection.on_task_delete = Driver.handle_delete_task_socket;
   connection.on_group_new = Driver.handle_new_group_socket;
+  connection.on_group_edit = Driver.handle_edit_group_socket;
   connection.on_group_delete = Driver.handle_delete_group_socket;
   connection.on_error = Driver.handle_error_socket;
 
