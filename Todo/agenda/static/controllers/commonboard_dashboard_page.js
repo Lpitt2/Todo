@@ -40,7 +40,7 @@ function handle_new_common_board_submission(event) {
     const title = document.getElementById("common_group_name_field").value;
 
     // Get the list of users.
-    const emails = shared_box.convert_shared_emails_to_list(document.getElementById("share_users_list"));
+    const emails = shared_box.convert_shared_usernames_to_list(document.getElementById("share_users_list"));
 
     // Send the creation request.
     fetch("http://localhost:8000/shared/new", {

@@ -6,7 +6,7 @@ export function handle_keydown_event_share_names_field(event) {
     const shared_emails_list = event.currentTarget.parentElement.querySelector("ul");
 
     // Get the list of emails.
-    const emails = convert_shared_emails_to_list(shared_emails_list);
+    const emails = convert_shared_usernames_to_list(shared_emails_list);
 
     // Get the names field.
     const name_field = event.currentTarget;
@@ -61,7 +61,7 @@ function delete_email_block_click(event) {
 /* Utility functions */
 
 
-export function convert_shared_emails_to_list(shared_elements_list) {
+export function convert_shared_usernames_to_list(shared_elements_list) {
 
     // Declare local variables.
     const emails = [];

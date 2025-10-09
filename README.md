@@ -470,14 +470,14 @@ __Input__:
   </tr>
   <tr>
     <td><code>title</code></td>
-    <td>True</td>
+    <td>False</td>
     <td>String</td>
     <td>The title of the new common board object.</td>
   </tr>
   <tr>
-    <td><code>add-user</code></td>
+    <td><code>add-users</code></td>
     <td>False</td>
-    <td>String</td>
+    <td>Array</td>
     <td>The username of a user to add to the common board object.</td>
   </tr>
   <tr>

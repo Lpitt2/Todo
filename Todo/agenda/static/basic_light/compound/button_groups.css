@@ -1,3 +1,5 @@
+/* Baseline declarations. */
+
 .button-group-row {
 
   padding: 0px;
@@ -12,12 +14,13 @@
 
   display: flex;
   flex-direction: column;
-  gap: 0px;
 
   border-radius: 5px;
 
 }
 
+
+/* Child elements. */
 
 .button-group-row > button, .button-group-row > a > button {
 
@@ -55,21 +58,6 @@
 
 }
 
-
-.button-group-row > button:first-child, .button-group-row > a:first-child button {
-
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-
-}
-
-.button-group-row > button:last-child, .button-group-row > a:last-child button {
-
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-
-}
-
 .button-group-row > input[type="button"]:first-child {
 
   border-top-left-radius: 10px;
@@ -84,6 +72,22 @@
 
 }
 
+
+/* Styling for the first and last child elements. */
+
+.button-group-row > button:first-child, .button-group-row > a:first-child button {
+
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+
+}
+
+.button-group-row > button:last-child, .button-group-row > a:last-child button {
+
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+
+}
 
 .button-group-column > button:first-child {
 

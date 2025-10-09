@@ -575,10 +575,19 @@ def shared_edit(request, id):
     common_board.title = data['title']
 
   # Determine if a user is added to the common board.
-  if ('new-user' in data):
+  if ('add-users' in data and type(data['add-users']) == type(list())):
 
-    # Add the user to the owners of the common board.
-    common_board.owners.add(get_object_or_404(User, username=data['new-user']))
+    # Add each user to the common board.
+    for user in data['add-users']:
+
+      # Get the user object.
+      try:
+
+        common_board.owners.add(User.objects.get(username=user))
+
+      except (User.DoesNotExist):
+
+        pass
 
   # Determine if a user was removed from the common board.
   if ('remove-user' in data):

@@ -16,6 +16,8 @@
 
     <button class="open-dialog-button button-primary" data-target="new-group-dialog">Create New Group</button>
 
+    <button class="open-dialog-button button-primary" data-target="share-dialog">Share</button>
+
   </div>
 
 </div>
@@ -130,6 +132,25 @@
       <button class="button-accept">Update Task</button>
 
     </div>
+
+  </form>
+
+</dialog>
+
+<!--Share dialog-->
+<dialog closedBy="any" id="share-dialog">
+
+  <form id="share-form">
+
+    <!--TODO: Add system to display users already in the group.-->
+
+    <!--Users list.-->
+    <div style="margin: 10pt;">
+      <ul class="element-list" id="add-user-share-name-list"></ul>
+      <input type="text" placeholder="Share With" id="add-user-share-name-field"/>
+    </div>
+
+    <button class="button-accept">Add Users</button>
 
   </form>
 

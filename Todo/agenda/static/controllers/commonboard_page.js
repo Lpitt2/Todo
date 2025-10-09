@@ -1,6 +1,7 @@
 import { Taskboard } from "../modules/taskboard.js";
 import { build_task_from_json } from "../modules/task.js";
 import { CommonSocket } from "../modules/user_socket.js";
+import * as shared_box from "../modules/share_box.js";
 import * as Driver from "../modules/taskboard_driver.js" ;
 
 let taskboard = null;
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("new-task-form").addEventListener("submit", handle_new_task_submission);
   document.getElementById("edit-task-form").addEventListener("submit", handle_edit_task_submission);
   document.getElementById("new-group-dialog").addEventListener("close", handle_new_group_dialog_close);
+  document.getElementById("share-form").addEventListener("submit", handle_share_submission);
 
   // Set up the event handlers for taskboard.
   taskboard.on_task_new = Driver.handle_new_task_taskboard;
@@ -44,6 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
   connection.on_group_edit = Driver.handle_edit_group_socket;
   connection.on_group_delete = Driver.handle_delete_group_socket;
   connection.on_error = Driver.handle_error_socket;
+
+  // Add the event handler for the share user name box.
+  document.getElementById("add-user-share-name-field").addEventListener("keydown", shared_box.handle_keydown_event_share_names_field);
 
   // Perform the initial rendering of the taskboard.
   render();
@@ -67,6 +72,10 @@ function render() {
   .then(response => response.json())
   .then(group_data => {
 
+    // Ensure that the group list is not null.
+    if (group_data['groups'] === null)
+      return;
+
     // Iterate over the groups within the response.
     group_data['groups'].forEach(group => {
 
@@ -77,6 +86,10 @@ function render() {
       fetch(`http://localhost:8000/group/info/${group['id']}`)
       .then(response => response.json())
       .then(task_data => {
+
+        // Ensure that the task list is not null.
+        if (task_data['tasks'] === null)
+          return;
 
         // Iterate over each task.
         task_data['tasks'].forEach(task => {
@@ -321,5 +334,32 @@ function handle_edit_task_submission(event) {
   event.preventDefault();
 
   document.getElementById("edit-task-dialog").close();
+
+}
+
+function handle_share_submission(event) {
+
+  // Get the common board id.
+  const common_id = document.getElementById("common_id").value;
+
+  // Get the list of users.
+  const usernames = shared_box.convert_shared_usernames_to_list(document.getElementById("add-user-share-name-list"));
+
+  // Prevent the form from submitting.
+  event.preventDefault();
+
+  // Build the request.
+  let data = JSON.stringify({
+    'add-users': usernames
+  });
+
+  // Make the request to the server to update the users.
+  fetch(`http://localhost:8000/shared/edit/${common_id}`, {
+    method: 'PUT',
+    body: data
+  });  
+
+  // Close the dialog.
+  document.getElementById("share-dialog").close();
 
 }
