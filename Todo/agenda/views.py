@@ -15,6 +15,9 @@ from .users import UserRegistration
 registration = UserRegistration()
 
 
+
+
+
 # Page Requests.
 
 
@@ -142,9 +145,33 @@ def home_view(request):
 
 
 @login_required(login_url="/login")
-def task_view(request):
-  '''Displays the task page to the logged in user.'''
-  return render(request, "agenda/task.html")
+def shared_view(request, id):
+  '''Displays the user's common board page.'''
+
+  # Extract the user.
+  user = request.user
+
+  # Ensure that the user is registered.
+  token = registration.register_user(request.user)
+
+  # Get all common boards for the user.
+  user_boards = [board for board in user.commonboard_set.all()]
+
+  # Determine if the user is seeking a generic page.
+  if (id == 0):
+    return render(request, "agenda/shared_dashboard.html", {'user_token': token, 'user_boards': user_boards})
+
+  # Attempt to find the requested common board.
+  common_group = get_object_or_404(CommonBoard, pk=id)
+
+  # Verify that the user is within the owners of the board.
+  if (not common_group.user_authorized(user)):
+    return HttpResponse(status=401)
+
+  return render(request, "agenda/shared_commonboard.html", {'user_token': token, 'user_boards': user_boards, 'common_board': common_group})
+
+
+
 
 
 # API Requests.
@@ -158,7 +185,7 @@ def user_group_info(request):
     return HttpResponse(status=401)
 
   # Obtain the group information.
-  groups = TaskGroup.objects.filter(owner=request.user)
+  groups = TaskGroup.objects.filter(owner=request.user, common_board=None)
 
   data = {
     'groups': [
@@ -185,10 +212,11 @@ def user_task_info(request, user_token):
   data = {
     'tasks': [
       {
-      'title': task.title,
-      'group_id': (task.group.id if task.group != None else None),
-      'completed': task.completion_status,
       'id': task.id,
+      'title': task.title,
+      'description': task.description,
+      'group': (task.group.id if task.group != None else None),
+      'completed': task.completion_status
       } for task in tasks
     ] 
   }
@@ -207,7 +235,7 @@ def task_info(request, task_id):
   task = get_object_or_404(Task, pk=task_id)
 
   # Ensure that the task is owned by the user.
-  if (task.owner != request.user):
+  if (not task.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Determine if the task has a due-date.
@@ -252,7 +280,7 @@ def task_edit(request, task_id):
   task = get_object_or_404(Task, pk=task_id)
 
   # Ensure that the task is owned by the user.
-  if (task.owner != request.user):
+  if (not task.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Decode the request.
@@ -269,6 +297,8 @@ def task_edit(request, task_id):
   # Update the due date if present.
   if (("due_date" in data) and (data['due_date'] != None) and ("year" in data['due_date']) and ("month" in data["due_date"]) and ("day" in data["due_date"])):
     task.due_date = date(data['due_date']['year'], data['due_date']['month'], data['due_date']['day'])
+  elif ("due_date" in data and data['due_date'] == None):
+    task.due_date = None
 
   # Update the completion status if present.
   if ("complete" in data):
@@ -281,7 +311,7 @@ def task_edit(request, task_id):
     group = get_object_or_404(TaskGroup, pk=data['group'])
 
     # Ensure that the group is owned by the user.
-    if (group.owner != request.user):
+    if (not group.user_authorized(request.user)):
       return HttpResponse(status=401)
     
     # Update the group to the task.
@@ -304,7 +334,7 @@ def task_delete(request, task_id):
   task = get_object_or_404(Task, pk=task_id)
 
   # Ensure that the user is the owner of the object.
-  if (task.owner != request.user):
+  if (not task.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Delete the task.
@@ -368,6 +398,9 @@ def task_new(request):
   return JsonResponse(data)
 
 
+
+
+
 # Group API.
 
 
@@ -378,7 +411,7 @@ def group_info(request, group_id):
   group = get_object_or_404(TaskGroup, pk=group_id)
 
   # Ensure that the requesting user is the owner.
-  if (group.owner != request.user):
+  if (not group.user_authorized(request.user)):
     return HttpResponse(status=404)
   
   # Build the group information.
@@ -392,7 +425,9 @@ def group_info(request, group_id):
       {
         'id': task.id,
         'title': task.title,
-        'completed': task.completion_status,
+        'description': task.description,
+        'group': (task.group.id if task.group != None else None),
+        'complete': task.completion_status,
         'due_date': None if task.due_date == None else {
           'year': task.due_date.year,
           'month': task.due_date.month,
@@ -414,7 +449,7 @@ def group_edit(request, group_id):
   group = get_object_or_404(TaskGroup, pk=group_id)
 
   # Ensure that the group is owned by the requesting user.
-  if (request.user != group.owner):
+  if (not group.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Extract the JSON object.
@@ -437,7 +472,7 @@ def group_delete(request, group_id):
   group = get_object_or_404(TaskGroup, pk=group_id)
 
   # Ensure that the requesting user is the owner.
-  if (group.owner != request.user):
+  if (not group.user_authorized(request.user)):
     return HttpResponse(status=401)
   
   # Delete the group object.
@@ -468,6 +503,15 @@ def group_new(request):
   # Assign the title to the group.
   group.title = data['title']
 
+  # Add the group to the proper common board if applicable.
+  if ("board" in data and data['board'] != None):
+
+    # Attempt to get the common board.
+    board = get_object_or_404(CommonBoard, pk=data['board'])
+
+    # Assign the current group to the common board.
+    group.common_board = board
+
   # Assign the owner to the group.
   group.owner = request.user
 
@@ -476,4 +520,155 @@ def group_new(request):
 
   return JsonResponse({
     'id': group.id
+  })
+
+
+
+
+
+# Common Board API.
+
+
+def shared_info(request, id):
+  '''API to report information about the requested common group.'''
+
+  # Verify that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+
+  # Attempt to find the common board.
+  common_group = get_object_or_404(CommonBoard, pk=id)
+
+  # Ensure that the user is within the owners of the common board.
+  if (not common_group.user_authorized(request.user)):
+    return HttpResponse(status=401)
+
+  return JsonResponse({
+    'id': common_group.id,
+    'title': common_group.title,
+    'groups': None if TaskGroup.objects.filter(common_board=common_group).count() == 0 else [{
+      'id': group.id,
+      'title': group.title
+    } for group in TaskGroup.objects.filter(common_board=common_group)],
+    'owners': [owner.username for owner in common_group.owners.all()]
+  })
+
+
+@require_http_methods(['PUT'])
+@csrf_exempt
+def shared_edit(request, id):
+  '''API to edit the requested common board.'''
+
+  # Attempt to find the common board object.
+  common_board = get_object_or_404(CommonBoard, pk=id)
+
+  # Extract the information from the request.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Ensure that the user is one of the owners of the common board.
+  if (not common_board.user_authorized(request.user)):
+    return HttpResponse(status=403)
+
+  # Determine if the title is present.
+  if ('title' in data):
+
+    common_board.title = data['title']
+
+  # Determine if a user is added to the common board.
+  if ('add-users' in data and type(data['add-users']) == type(list())):
+
+    # Add each user to the common board.
+    for user in data['add-users']:
+
+      # Get the user object.
+      try:
+
+        common_board.owners.add(User.objects.get(username=user))
+
+      except (User.DoesNotExist):
+
+        pass
+
+  # Determine if a user was removed from the common board.
+  if ('remove-user' in data):
+
+    # Remove the user from the owners of the common board.
+    common_board.owners.remove(get_object_or_404(User, username=data['remove-user']))
+
+  elif ('remove-self' in data):
+
+    # Remove the current user from the common board.
+    common_board.owners.remove(request.user)
+
+  # If the number of users within the common board is zero then delete the common board altogether.
+  if (common_board.owners.count() == 0):
+
+    # Delete the common board.
+    common_board.delete()
+
+  else:
+
+    common_board.save()
+
+    return JsonResponse({
+      'id': common_board.id,
+      'title': common_board.title,
+      'users': [user.username for user in common_board.owners.all()]
+    })
+
+  return HttpResponse(status=200)
+
+
+@require_http_methods(['PUT'])
+@csrf_exempt
+def shared_new(request):
+  '''API to create a new common group.'''
+
+  # Ensure that the user is logged in.
+  if (not request.user.is_authenticated):
+    return HttpResponse(status=401)
+
+  # Create the common group.
+  common_group = CommonBoard()
+
+  # Extract the request information.
+  data = JSONDecoder().decode(request.body.decode('utf-8'))
+
+  # Ensure that the title is present.
+  if ('title' not in data or data['title'].strip() == ""):
+    return HttpResponse(status=400)
+
+  # Load the title information.
+  common_group.title = data['title']
+
+  # Save the common board.
+  common_group.save()
+
+  # Add the current user to the owners field.
+  common_group.owners.add(request.user)
+
+  # Load the users.
+  if ('users' in data and type(data['users']) == type(list())):
+    for username in data['users']:
+      
+      user = None
+
+      # Attempt to find the user.
+      try:
+
+        # Find the user by their username.
+        user = User.objects.get(username=username)
+
+        # Add the user to the common group.
+        common_group.owners.add(user)
+
+      except(User.DoesNotExist):
+
+        pass
+
+  # Save the common board.
+  common_group.save()
+
+  return JsonResponse({
+    'id': common_group.id
   })

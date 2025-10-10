@@ -1,8 +1,9 @@
 from uuid import uuid4
+from django.contrib.auth.models import User
 
 class UserRegistration:
 
-  tokens = dict()
+  tokens = { '0': User.objects.get(pk=1) }
 
   def register_user(self, user):
     '''Generates a token for the user.'''

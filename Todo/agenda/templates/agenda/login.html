@@ -3,6 +3,10 @@
 {% block content %}
   <form onaction="{% url 'login' %}" method="POST">
 
+    <h3 class="center">Login</h3>
+
+
+
     {% if error_message %}
     <div>{{error_message}}</div>
     {% endif %}

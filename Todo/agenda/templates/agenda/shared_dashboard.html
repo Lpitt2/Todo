@@ -1,0 +1,67 @@
+{% extends './base/main_page.html' %}
+
+{% load static %}
+
+{% block metadata %}
+  <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
+  <script type="module" src="{% static 'controllers/commonboard_dashboard_page.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'taskboard.css' %}">
+
+  {% block taskboard_metadata %}{% endblock %}
+
+{% endblock %}
+
+{% block content %}
+
+  <div class="layout-body-split">
+
+    <ul class="layout-left-body element-list" id="common_board_list">
+
+      <li><button class="button-primary open-dialog-button stretch" data-target="create-common-group-dialog">Create New Common Group</button></li>
+
+      <hr/>
+
+      {% for group in user_boards %}
+
+      <li data-commonboard="{{ group.id }}"><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a></li>
+
+      {% endfor %}
+
+    </ul>
+
+    <div class="layout-center-right">
+
+      {% block taskboard %}{% endblock %}
+
+    </div>
+
+    <!--User Token-->
+    <input type="hidden" value="{{ user_token }}" id="user_token">
+
+    <!--Create Common Group dialog.-->
+    <dialog closedBy="any" id="create-common-group-dialog">
+      <form id="create-common-group-form">
+
+        <h4 class="center">New Common Group</h4>
+
+        <div style="margin: 10pt;">
+          <input type="text" placeholder="Name of Board" id="common_group_name_field"/>
+        </div>
+
+        <div style="margin: 10pt;">
+          <ul class="element-list" id="share_users_list"></ul>
+          <input type="text" placeholder="Share With" id="share_name_field"/>
+        </div>
+
+        <div>
+          <button class="button-accept">Create Board</button>
+        </div>
+
+      </form>
+    </dialog>
+
+    {% block dialogs %}{% endblock %}
+
+  </div>
+
+{% endblock %}

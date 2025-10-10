@@ -17,10 +17,11 @@
 
     <ul class="nav-menu-primary">
 
-      <li><a href="{% url 'index' %}"><h3 style="margin: 3px; padding: 3px;">Agenda</h3></a></li>
+      <li><a href="{% url 'index' %}"><img style="padding-top: 6pt; padding-bottom: 6pt;" src="{% static 'icons/logo.svg' %}" height="25"></a></li>
 
       {% if user.is_authenticated %}
       <li><a href="{% url 'home' %}"><button class="button-primary">Home</button></a></li>
+      <li><a href="{% url 'shared' 0 %}"><button class="button-primary">Shared</button></a></li>
       {% endif %}
 
     </ul>
@@ -41,7 +42,7 @@
   </div>
 
   <div class="layout-page-footer">
-    Footer Text
+    {% block footer %}{% endblock %}
   </div>
 
 </body>

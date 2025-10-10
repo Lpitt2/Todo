@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 from . import consumers
@@ -6,9 +6,9 @@ from . import consumers
 urlpatterns = [
   path("", views.index_view, name="index"),
   path("home", views.home_view, name="home"),
+  path("shared/<int:id>", views.shared_view, name="shared"),
   path("login", views.login_view, name="login"),
   path("register", views.register_view, name="register"),
-  path("tasks", views.task_view, name="task-view"),
 
   # General information API.
   path("user/groups", views.user_group_info, name="user-group-info"),
@@ -24,10 +24,17 @@ urlpatterns = [
   path("group/info/<int:group_id>", views.group_info, name="group-info"),
   path("group/edit/<int:group_id>", views.group_edit, name="group-edit"),
   path("group/delete/<int:group_id>", views.group_delete, name="group-delete"),
-  path("group/new", views.group_new, name="group-new")
+  path("group/new", views.group_new, name="group-new"),
+
+  # Common Board API.
+
+  path("shared/info/<int:id>", views.shared_info, name="shared-info"),
+  path("shared/edit/<int:id>", views.shared_edit, name="shared-edit"),
+  path("shared/new", views.shared_new, name="shared-new")
 ]
 
 
 websocket_urls = [
-  path('sockets/user', consumers.UserConsumer.as_asgi())
+  path('sockets/user', consumers.UserConsumer.as_asgi()),
+  path('sockets/common', consumers.CommonComumer.as_asgi())
 ]

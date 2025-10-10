@@ -9,6 +9,7 @@
 @import "./elements/form.css";
 @import "./elements/dialog.css";
 @import "./elements/lists.css";
+@import "./elements/headings.css";
 
 /* Styling for compound elements. */
 @import "./compound/button_groups.css";
@@ -44,5 +45,13 @@ html > body
   font-size: 36pt;
 
   padding: 14pt;
+
+}
+
+hr {
+
+  border: 1px solid black;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
 
 }

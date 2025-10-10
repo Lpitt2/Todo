@@ -6,3 +6,10 @@ dialog {
   background: #00000000;
 
 }
+
+::backdrop {
+
+  
+  backdrop-filter: blur(5px);
+
+}

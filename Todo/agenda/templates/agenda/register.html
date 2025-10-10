@@ -3,6 +3,8 @@
 {% block content %}
   <form onaction="{% url 'register' %}" method="POST">
 
+    <h3 class="center">Register</h3>
+
     {% if error_message %}
     <div>{{ error_message }}</div>
     {% endif %}

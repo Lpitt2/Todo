@@ -1,44 +1,49 @@
-{% extends './base/main_page.html' %}
+{% extends './shared_dashboard.html' %}
 
 {% load static %}
 
-{% block metadata %}
-  <link rel="stylesheet" href="{% static 'taskboard.css' %}">
-
-  <script type="text/javascript" src="{% static 'basic_light/elements/dialog.js' %}"></script>
-  <script type="module" src="{% static 'controllers/dashboard_page.js' %}"></script>
+{% block taskboard_metadata %}
+  <script type="module" src="{% static 'controllers/commonboard_page.js' %}"></script>
 {% endblock %}
-  
-{% block content %}
+
+{% block taskboard %}
 
 <div class="left-right-container">
 
-  <h4 style="display: inline; margin: 3px; padding: 3px;">Dashboard</h4>
+  <h4 style="display: inline; margin: 3px; padding: 3px;">{{ common_board.title }}</h4>
 
   <div class="right-container">
 
     <button class="open-dialog-button button-primary" data-target="new-group-dialog">Create New Group</button>
 
+    <button id="add-users-button" class="open-dialog-button button-primary" data-target="share-dialog">Share</button>
+    
+    <button id="leave-group-button" class="button-warning common-board-leave-button">Leave Group</button>
+
   </div>
 
 </div>
 
-<div class="layout-center-right"> 
-
+<div>
+  
   <ul class="horizontal-list element-list taskboard">
 
   </ul>
 
-  <!--User Token-->
-  <input type="hidden" value="{{ user_token }}" id="user_token">
-
 </div>
 
+{% endblock %}
+
+{% block dialogs %}
+
+<input type="hidden" value="{{ common_board.id }}" id="common_id">
 
 <!--New Task dialog-->
 <dialog closedBy="any" id="new-task-dialog">
     
   <form id="new-task-form">
+
+    <h4 class="center">New Task</h4>
 
     <span id="new-task-alert" style="color: red"></span>
 
@@ -78,6 +83,8 @@
 
   <form id="new-group-form">
     
+    <h4 class="center">New Group</h4>
+    
     <!--Group name field-->
     <div style="margin: 10pt;">
 
@@ -99,6 +106,8 @@
 <dialog closedBy="any" id="edit-task-dialog">
 
   <form id="edit-task-form">
+
+    <h4 class="center">Edit Task</h4>
 
     <!--Task Name field-->
     <div>
@@ -135,6 +144,25 @@
       <button class="button-accept">Update Task</button>
 
     </div>
+
+  </form>
+
+</dialog>
+
+<!--Share dialog-->
+<dialog closedBy="any" id="share-dialog">
+
+  <form id="share-form">
+
+    <h4 class="center">Share</h4>
+
+    <!--Users list.-->
+    <div style="margin: 10pt;">
+      <ul class="element-list" id="add-user-share-name-list"></ul>
+      <input type="text" placeholder="Users to Share With" id="add-user-share-name-field"/>
+    </div>
+
+    <button class="button-accept">Add Users</button>
 
   </form>
 

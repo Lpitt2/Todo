@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0, 0, 57 10">
+  
+  <!--Icon-->
+  <rect x="1" y="1" width="8" height="8" rx="1" stroke="purple" fill="transparent"/>
+
+  <polyline points="2,5 4,7 7,3" fill="none" stroke="purple" endcap="rounded"/>
+
+  <text x="11" y="9" font-size="11" stroke="purple" stroke-width="0.5" fill="purple">
+    AGENDA
+  </text>
+
+</svg>
