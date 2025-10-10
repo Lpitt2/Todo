@@ -1,5 +1,7 @@
 {% extends './base/main_page.html' %}
 
+{% load static %}
+
 {% block metadata %}{% endblock %}
 
 {% block content %}
@@ -13,9 +15,50 @@
 
     <p>
       Create, manage, and share to-do lists with ease when using Agenda. Our web-based application allows you to manage
-      multiple to-do lists on your personal dashboard or collaborate with other users with shared projects. To begin, 
-      <a href="{% url 'register' %}">create a free account</a>.
+      multiple to-do lists on your personal dashboard or collaborate with other users through our common boards. To 
+      begin, <a href="{% url 'register' %}">create a free account</a>.
     </p>
+
+    <hr/>
+
+    <h3>To-Do Lists</h3>
+
+    <p>
+      Our to-do lists follow the familiar Kanban layout used by multiple planning softwares including Jira&trade;. Lists are 
+      represented by columns which contain the tasks. Task information may include a title, description, and due date.
+      Tasks that are over due or due today are easily identifiable by their colors which dynamically change depending on
+      their status. Red tasks are overdue, blue tasks are due today, grey tasks are due in the future or are not assigned a 
+      due date, and green tasks are completed. Tasks are also automatically ordered to show the most pressing tasks first. 
+      New lists are easily added and removed.
+    </p>
+
+    <ul class="element-list center-horizontal">
+
+      <li>
+
+        <img src="{% static 'images/late-task.png' %}" alt="Late task example">
+
+      </li>
+
+      <li>
+
+        <img src="{% static 'images/due-today-task.png' %}" alt="Task that is due today example">
+
+      </li>
+
+      <li>
+
+        <img src="{% static 'images/future-task.png' %}" alt="Task that is due in the future">
+
+      </li>
+
+      <li>
+
+        <img src="{% static 'images/completed-task.png' %}" alt="Task that has been completed.">
+
+      </li>
+
+    </ul>
 
   </div>
 

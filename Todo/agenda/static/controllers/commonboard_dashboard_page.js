@@ -9,11 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Add event listners to the new common board elements.
     document.getElementById("share_name_field").addEventListener("keydown", shared_box.handle_keydown_event_share_names_field);
 
-    // Add the event handlers to the leave common board buttons.
-    document.querySelectorAll(".common-board-leave-button").forEach(button => {
-        button.addEventListener("click", handle_leave_common_board_click);
-    })
-
 });
 
 
@@ -77,39 +72,6 @@ function handle_new_common_board_submission(event) {
 
 
 
-/* Leave common board button clicked. */
-
-
-async function handle_leave_common_board_click(event) {
-
-    // Prompt the user to confirm their action.
-    if (window.confirm("Are you sure you want to leave this common board?")) {
-
-        // Get the host element.
-        const host = event.currentTarget.parentElement.parentElement;
-
-        // Get the common board id.
-        const id = host.dataset['commonboard'];
-
-        // Remove the current user from the common board.
-        await fetch(`http://localhost:8000/shared/edit/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    'remove-self': null
-                })
-        });
-
-        // Remove the common group button from the list.
-        host.remove();
-
-    }
-
-}
-
-
-
-
-
 /* Utilities. */
 
 
@@ -117,34 +79,18 @@ function create_new_community_board_button(title, id) {
 
     // Create the necessary elements.
     const list_item_container = document.createElement("li");
-    const button_group = document.createElement("span");
     const link = document.createElement("a");
     const link_button = document.createElement("button");
-    const leave_button = document.createElement("button");
-    const leave_icon = document.createElement("img");
 
     // Create the structure.
-    leave_button.append(leave_icon);
     link.append(link_button);
-    button_group.append(link);
-    button_group.append(leave_button);
-    list_item_container.append(button_group);
-
-    // Setup the leave icon image.
-    leave_icon.src = "/static/icons/delete.svg";
-    leave_icon.width = 10;
-    leave_icon.height = 10;
+    list_item_container.append(link);
 
     // Set the title of the link button.
     link_button.textContent = title;
 
     // Set up the styling for the elements.
-    button_group.className = "button-group-row";
     link_button.className = "button-secondary stretch";
-    leave_button.className = "button-warning";
-
-    // Set the click event handler of the leave button.
-    leave_button.addEventListener("click", handle_leave_common_board_click);
 
     // Set the address of the link.
     link.href = `/shared/${id}`;

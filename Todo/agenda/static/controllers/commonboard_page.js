@@ -50,6 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add the event handler for the share user name box.
   document.getElementById("add-user-share-name-field").addEventListener("keydown", shared_box.handle_keydown_event_share_names_field);
 
+  // Add the leave group button event handler.
+  document.getElementById("leave-group-button").addEventListener("click", handle_leave_common_board_click);
+
   // Perform the initial rendering of the taskboard.
   render();
 
@@ -361,5 +364,32 @@ function handle_share_submission(event) {
 
   // Close the dialog.
   document.getElementById("share-dialog").close();
+
+}
+
+
+
+
+
+/* Leave common board button clicked. */
+
+
+function handle_leave_common_board_click(event) {
+
+    // Get the common board id.
+    const common_id = document.getElementById("common_id").value;
+
+    // Prompt the user to confirm their action.
+    if (window.confirm("Are you sure you want to leave this common board?")) {
+
+        // Remove the current user from the common board.
+        fetch(`http://localhost:8000/shared/edit/${common_id}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    'remove-self': null
+                })
+        }).then(response => window.location.href = "http://localhost:8000/shared/0");
+
+    }
 
 }

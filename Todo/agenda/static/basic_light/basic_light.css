@@ -9,6 +9,7 @@
 @import "./elements/form.css";
 @import "./elements/dialog.css";
 @import "./elements/lists.css";
+@import "./elements/headings.css";
 
 /* Styling for compound elements. */
 @import "./compound/button_groups.css";

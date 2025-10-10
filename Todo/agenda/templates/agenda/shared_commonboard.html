@@ -17,14 +17,20 @@
     <button class="open-dialog-button button-primary" data-target="new-group-dialog">Create New Group</button>
 
     <button class="open-dialog-button button-primary" data-target="share-dialog">Share</button>
+    
+    <button id="leave-group-button" class="button-warning common-board-leave-button">Leave Group</button>
 
   </div>
 
 </div>
 
-<ul class="horizontal-list element-list taskboard">
+<div>
+  
+  <ul class="horizontal-list element-list taskboard">
 
-</ul>
+  </ul>
+
+</div>
 
 {% endblock %}
 
@@ -36,6 +42,8 @@
 <dialog closedBy="any" id="new-task-dialog">
     
   <form id="new-task-form">
+
+    <h4 class="center">New Task</h4>
 
     <span id="new-task-alert" style="color: red"></span>
 
@@ -75,6 +83,8 @@
 
   <form id="new-group-form">
     
+    <h4 class="center">New Group</h4>
+    
     <!--Group name field-->
     <div style="margin: 10pt;">
 
@@ -96,6 +106,8 @@
 <dialog closedBy="any" id="edit-task-dialog">
 
   <form id="edit-task-form">
+
+    <h4 class="center">Edit Task</h4>
 
     <!--Task Name field-->
     <div>
@@ -142,12 +154,14 @@
 
   <form id="share-form">
 
+    <h4 class="center">Share</h4>
+
     <!--TODO: Add system to display users already in the group.-->
 
     <!--Users list.-->
     <div style="margin: 10pt;">
       <ul class="element-list" id="add-user-share-name-list"></ul>
-      <input type="text" placeholder="Share With" id="add-user-share-name-field"/>
+      <input type="text" placeholder="Users to Share With" id="add-user-share-name-field"/>
     </div>
 
     <button class="button-accept">Add Users</button>

@@ -38,35 +38,40 @@
   justify-items: center;
 
   margin: 4pt;
-  padding: 8pt;
+  padding: 10pt;
 
   color: #bbbbbbff;
 
   word-wrap: normal;
+  border-radius: 4pt;
 
 }
 
 .future-task {
 
   background-color: #7b7b7b;
+  border: 2px solid #cecece;
 
 }
 
 .late-task {
 
   background-color: #dd1111;
+  border: 2px solid #ff2222;
 
 }
 
 .due-today-task {
 
   background-color: #3377ff;
+  border: 2px solid #4499ff;
 
 }
 
 .completed-task {
 
   background-color: #00dd00;
+  border: 2px solid #33ff33;
 
   text-decoration: line-through;  
 

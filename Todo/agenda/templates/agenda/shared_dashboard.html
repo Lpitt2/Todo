@@ -23,7 +23,7 @@
 
       {% for group in user_boards %}
 
-      <li data-commonboard="{{ group.id }}"><span class="button-group-row"><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a><button class="button-warning common-board-leave-button"><img width="10" height="10" src="{% static 'icons/delete.svg' %}"></button></span></li>
+      <li data-commonboard="{{ group.id }}"><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a></li>
 
       {% endfor %}
 
@@ -41,6 +41,8 @@
     <!--Create Common Group dialog.-->
     <dialog closedBy="any" id="create-common-group-dialog">
       <form id="create-common-group-form">
+
+        <h4 class="center">New Common Group</h4>
 
         <div style="margin: 10pt;">
           <input type="text" placeholder="Name of Board" id="common_group_name_field"/>
