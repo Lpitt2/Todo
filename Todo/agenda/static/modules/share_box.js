@@ -3,10 +3,10 @@
 export function handle_keydown_event_share_names_field(event) {
 
     // Get the list of emails.
-    const shared_emails_list = event.currentTarget.parentElement.querySelector("ul");
+    const shared_usernames_list = event.currentTarget.parentElement.querySelector("ul");
 
     // Get the list of emails.
-    const emails = convert_shared_usernames_to_list(shared_emails_list);
+    const users = convert_shared_usernames_to_list(shared_usernames_list, false);
 
     // Get the names field.
     const name_field = event.currentTarget;
@@ -21,13 +21,13 @@ export function handle_keydown_event_share_names_field(event) {
         if (email !== "") {
 
             // Verify that the email does not already exist within the list.
-            if (!emails.includes(email)) {
+            if (!users.includes(email)) {
 
                 // Build the email block.
-                const block = build_email_block(email);
+                const block = build_user_block(email);
 
                 // Append the block to the list.
-                shared_emails_list.append(block);
+                shared_usernames_list.append(block);
 
                 // Clear the content of the names field.
                 name_field.value = "";
@@ -61,13 +61,14 @@ function delete_email_block_click(event) {
 /* Utility functions */
 
 
-export function convert_shared_usernames_to_list(shared_elements_list) {
+export function convert_shared_usernames_to_list(shared_elements_list, remove_ignored_users = true) {
 
     // Declare local variables.
     const emails = [];
 
     // Iterate over each element within the shared email list.
     shared_elements_list.querySelectorAll("li").forEach(email_block => {
+        if (!remove_ignored_users || (email_block.dataset['ignore'] === "false"))
         emails.push(email_block.querySelector("span").innerHTML);
     })
 
@@ -76,7 +77,23 @@ export function convert_shared_usernames_to_list(shared_elements_list) {
 }
 
 
-function build_email_block(email) {
+export function preset_email_list(shared_usernames_list, users) {
+
+    // Get the email list object.
+    const usernames_list = document.getElementById(shared_usernames_list);
+
+    // Add each email to the list.
+    users.forEach(user => {
+
+        // Add the user to the block.
+        usernames_list.append(build_user_block(user, true));
+
+    });
+    
+}
+
+
+function build_user_block(user, ignore = false) {
 
     // Declare elements.
     const block = document.createElement("li");
@@ -97,7 +114,10 @@ function build_email_block(email) {
     delete_button.height = 10;
 
     // Set the email value of the user.
-    title_block.innerHTML = email;
+    title_block.innerHTML = user;
+
+    // Set the data attribute.
+    block.dataset['ignore'] = ignore;
 
     // Add the event handler to the delete button.
     delete_button.addEventListener("click", delete_email_block_click);

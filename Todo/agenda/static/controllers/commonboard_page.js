@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Add the event handler for the share user name box.
   document.getElementById("add-user-share-name-field").addEventListener("keydown", shared_box.handle_keydown_event_share_names_field);
+  document.getElementById("add-users-button").addEventListener("click", handle_share_dialog_open);
 
   // Add the leave group button event handler.
   document.getElementById("leave-group-button").addEventListener("click", handle_leave_common_board_click);
@@ -292,6 +293,28 @@ function handle_new_group_dialog_close(event) {
 
    // Clear the contents of the fields.
   document.getElementById("new-group-name-field").value = "";
+
+}
+
+function handle_share_dialog_open(event) {
+
+  // Get the common board id.
+  const common_id = document.getElementById("common_id").value;
+
+  // Get the users already within the group.
+  fetch(`http://localhost:8000/shared/info/${common_id}`)
+  .then(response => response.json())
+  .then(data => {
+
+    // Ensure that the list of users is present.
+    if (data.hasOwnProperty("owners") && typeof(data['owners']) === typeof([])) {
+
+      // Add the default users to the shared box.
+      shared_box.preset_email_list("add-user-share-name-list", data['owners']);
+
+    }
+
+  });
 
 }
 
