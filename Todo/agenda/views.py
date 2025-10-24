@@ -570,7 +570,7 @@ def shared_edit(request, id):
     return HttpResponse(status=403)
 
   # Determine if the title is present.
-  if ('title' in data):
+  if ('title' in data and type(data['title']) == type(str()) and data['title'].strip() != ""):
 
     common_board.title = data['title']
 

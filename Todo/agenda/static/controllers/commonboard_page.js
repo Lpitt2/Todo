@@ -1,6 +1,6 @@
 import { Taskboard } from "../modules/taskboard.js";
 import { build_task_from_json } from "../modules/task.js";
-import { CommonSocket } from "../modules/user_socket.js";
+import { CommonSocket, ISocket } from "../modules/user_socket.js";
 import * as shared_box from "../modules/share_box.js";
 import * as Driver from "../modules/taskboard_driver.js" ;
 
@@ -46,13 +46,15 @@ document.addEventListener("DOMContentLoaded", () => {
   connection.on_group_edit = Driver.handle_edit_group_socket;
   connection.on_group_delete = Driver.handle_delete_group_socket;
   connection.on_error = Driver.handle_error_socket;
+  connection.on_board_update = handle_edit_common_board;
 
   // Add the event handler for the share user name box.
   document.getElementById("add-user-share-name-field").addEventListener("keydown", shared_box.handle_keydown_event_share_names_field);
   document.getElementById("add-users-button").addEventListener("click", handle_share_dialog_open);
 
-  // Add the leave group button event handler.
+  // Add the administration event handlers.
   document.getElementById("leave-group-button").addEventListener("click", handle_leave_common_board_click);
+  document.getElementById("board_title_header").addEventListener("focusout", handle_board_rename);
 
   // Perform the initial rendering of the taskboard.
   render();
@@ -112,6 +114,16 @@ function render() {
 
   });
   
+}
+
+function handle_edit_common_board(data) {
+
+  // Get the elements.
+  const board_name_field = document.getElementById("board_title_header");
+
+  // Update the name.
+  board_name_field.innerText = data['title'];
+
 }
 
 
@@ -394,7 +406,7 @@ function handle_share_submission(event) {
 
 
 
-/* Leave common board button clicked. */
+/* Leave common board administration events. */
 
 
 function handle_leave_common_board_click(event) {
@@ -414,5 +426,32 @@ function handle_leave_common_board_click(event) {
         }).then(response => window.location.href = "http://localhost:8000/shared/0");
 
     }
+
+}
+
+function handle_board_rename(event) {
+
+  // Get the element values.
+  const board_name = `${document.getElementById("board_title_header").innerText}`;
+  const commonboard_id = document.getElementById("common_id").value;
+
+  // Ensure that the name is not empty.
+  if (board_name.trim() === "") {
+
+    alert("Board name cannot be empty.");
+
+    return;
+
+  }
+
+  // Make the name change request to the server.
+  fetch (`http://localhost:8000/shared/edit/${commonboard_id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      'title': board_name
+    })
+  }).then(response => {
+    connection.request(ISocket.UPDATE, CommonSocket.BOARD, null);
+  });
 
 }

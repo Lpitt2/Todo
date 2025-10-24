@@ -106,6 +106,13 @@ export class ISocket extends WebSocket {
     const activity = raw_message['activity'];
     const type = raw_message['type'];
 
+    // Process the message.
+    this._process_message(data, activity, type);
+
+  }
+
+  _process_message(data, activity, type) {
+
     // Determine the request type.
     if (type === "TASK") {
 
@@ -155,6 +162,8 @@ export class ISocket extends WebSocket {
 
     }
 
+    return true;
+
   }
 
 };
@@ -190,7 +199,14 @@ export class UserSocket extends ISocket {
 
 export class CommonSocket extends ISocket {
 
+  // Additional constant that is only used for common socket.
+
+  static BOARD = "BOARD";
+
+  
   #common_id = null;
+
+  #on_board_update;
 
   constructor(url, user_token, common_id) {
 
@@ -207,6 +223,15 @@ export class CommonSocket extends ISocket {
 
 
 
+  /**/
+  
+
+  set on_board_update(on_board_update) { this.#on_board_update = on_board_update; }
+
+
+
+
+
   /* Web Socket Event Handlers. */
 
 
@@ -216,6 +241,23 @@ export class CommonSocket extends ISocket {
       'user-token': this._user_token,
       'id': this.#common_id
     }));
+
+  }
+
+  _process_message(data, activity, type) {
+    
+    // Verify that the message is valid.
+    if (super._process_message(data, activity, type)) {
+
+      // Determine if the message is updating the common board information.
+      if (type === "BOARD" && activity === "UPDATE") {
+
+        // Call the board update callback.
+        this.#on_board_update(data);
+
+      }
+
+    }
 
   }
 

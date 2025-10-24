@@ -272,6 +272,7 @@ class CommonComumer(WebsocketConsumer):
 
     # Set the group name.
     self.group_name = None
+    self.common_board_id = None
     self.common_board = None
 
     self.accept()
@@ -307,7 +308,7 @@ class CommonComumer(WebsocketConsumer):
       return
 
     # Ensure that the activity, type, and id attributes are present.
-    if ('activity' not in data or 'type' not in data or 'id' not in data):
+    if ('activity' not in data or 'type' not in data or ('type' in data and data['type'] != "BOARD" and 'id' not in data)):
 
       # Send error message.
       self.send_error(400, "Requires 'type', 'activity', and 'id' attributes.")
@@ -317,7 +318,7 @@ class CommonComumer(WebsocketConsumer):
     # Extract the data attributes.
     activity = data['activity']
     type = data['type']
-    id = data['id']
+    id = data['id'] if 'id' in data else None
 
     # Determine the request.
     if (activity == "CREATE" and type == "TASK"):
@@ -328,6 +329,8 @@ class CommonComumer(WebsocketConsumer):
       self.handle_group_create(id)
     elif (activity == "UPDATE" and type == "GROUP"):
       self.handle_group_update(id)
+    elif (activity == "UPDATE" and type == "BOARD"):
+      self.handle_board_update(data)
     elif (activity == "DELETE"):
       self.handle_delete(data)
     else:
@@ -391,6 +394,7 @@ class CommonComumer(WebsocketConsumer):
 
     # Attempt to get the commonboard object.
     self.common_board = self.get_object_or_404(CommonBoard, common_board_id)
+    self.common_board_id = common_board_id
 
     # Determine if the common board was not found.
     if (self.common_board == None):
@@ -538,6 +542,24 @@ class CommonComumer(WebsocketConsumer):
         'activity': "UPDATE",
         'type': "TASK",
         'data': task.get_task_as_dictionary()
+      })
+    })
+
+  def handle_board_update(self, id):
+    """Handles update information to the common board."""
+    
+    # Get the common board object.
+    self.common_board = self.get_object_or_404(CommonBoard, self.common_board_id)
+
+    # Send the updated information to the users.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': "UPDATE",
+        'type': "BOARD",
+        'data': {
+          'title': self.common_board.title
+        }
       })
     })
 
