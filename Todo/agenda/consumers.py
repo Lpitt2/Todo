@@ -558,6 +558,7 @@ class CommonComumer(WebsocketConsumer):
         'activity': "UPDATE",
         'type': "BOARD",
         'data': {
+          'id': self.common_board_id,
           'title': self.common_board.title
         }
       })

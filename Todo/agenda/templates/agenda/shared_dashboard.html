@@ -23,7 +23,7 @@
 
       {% for group in user_boards %}
 
-      <li data-commonboard="{{ group.id }}"><a href="{% url 'shared' group.id %}"><button class="button-secondary stretch">{{ group.title }}</button></a></li>
+      <li data-commonboard="{{ group.id }}"><a href="{% url 'shared' group.id %}"><button id="common_board_button_{{ group.id }}" class="button-secondary stretch">{{ group.title }}</button></a></li>
 
       {% endfor %}
 

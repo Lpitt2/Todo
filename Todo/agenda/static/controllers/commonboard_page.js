@@ -120,9 +120,11 @@ function handle_edit_common_board(data) {
 
   // Get the elements.
   const board_name_field = document.getElementById("board_title_header");
+  const common_board_button = document.getElementById(`common_board_button_${data['id']}`);
 
   // Update the name.
   board_name_field.innerText = data['title'];
+  common_board_button.innerText = data['title'];
 
 }
 
