@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 {% load static %}
+{% load user %}
 
 <html lang="en-US">
 
@@ -31,7 +32,7 @@
       <li><a href="{% url 'login' %}"><button class="button-primary">Log In</button></a></li>
       <li><a href="{% url 'register' %}"><button class="button-primary">Register</button></a></li>
       {% else %}
-      <li>Welcome</li>
+      <li>{% user_avatar request.user %}</li>
       {% endif %}
     </ul>
 
