@@ -4,8 +4,6 @@
 
   padding: 0px;
 
-  border-radius: 10px;
-
 }
 
 .button-group-column {
@@ -60,15 +58,15 @@
 
 .button-group-row > input[type="button"]:first-child {
 
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-top-left-radius: 50%;
+  border-bottom-left-radius: 50%;
 
 }
 
 .button-group-row > input[type="button"]:last-child {
 
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
 
 }
 
@@ -77,15 +75,15 @@
 
 .button-group-row > button:first-child, .button-group-row > a:first-child button {
 
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-top-left-radius: 50%;
+  border-bottom-left-radius: 50%;
 
 }
 
 .button-group-row > button:last-child, .button-group-row > a:last-child button {
 
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
 
 }
 

@@ -1,0 +1,12 @@
+.user_icon {
+
+  width: 40px;
+  border-radius: 50%;
+
+}
+
+.user_icon:hover {
+
+  content: url("http://localhost:8000/static/icons/delete.svg");
+
+}

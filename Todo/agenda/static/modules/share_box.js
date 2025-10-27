@@ -1,3 +1,5 @@
+import { UserIcon } from "./user_icon.js";
+
 /* Event handlers. */
 
 export function handle_keydown_event_share_names_field(event) {
