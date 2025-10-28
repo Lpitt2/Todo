@@ -19,3 +19,14 @@
   gap: 10pt;
 
 }
+
+.grid-list {
+
+  display: flex;
+  flex-direction: row;
+  gap: 10pt;
+  
+  list-style: none;
+  flex-wrap: wrap;
+
+}

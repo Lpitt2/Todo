@@ -324,7 +324,7 @@ function handle_share_dialog_open(event) {
     if (data.hasOwnProperty("owners") && typeof(data['owners']) === typeof([])) {
 
       // Add the default users to the shared box.
-      shared_box.preset_email_list("add-user-share-name-list", data['owners']);
+      shared_box.preset_share_list("add-user-share-name-list", data['owners']);
 
     }
 

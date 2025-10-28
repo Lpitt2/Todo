@@ -2,57 +2,57 @@ import { UserIcon } from "./user_icon.js";
 
 /* Event handlers. */
 
-export function handle_keydown_event_share_names_field(event) {
+export async function handle_keydown_event_share_names_field(event) {
 
-    // Get the list of emails.
-    const shared_usernames_list = event.currentTarget.parentElement.querySelector("ul");
+  // Get the list of emails.
+  const shared_usernames_list = event.currentTarget.parentElement.querySelector("ul");
 
-    // Get the list of emails.
-    const users = convert_shared_usernames_to_list(shared_usernames_list, false);
+  // Get the list of emails.
+  const users = convert_shared_usernames_to_list(shared_usernames_list, false);
 
-    // Get the names field.
-    const name_field = event.currentTarget;
+  // Get the names field.
+  const name_field = event.currentTarget;
 
-    // Determine if the key being pressed was the return (enter) key.
-    if (event.key === "Enter") {
+  // Determine if the key being pressed was the return (enter) key.
+  if (event.key === "Enter") {
 
-        // Get the current email entered by the user.
-        const email = name_field.value;
+    // Prevent the form from submitting.
+    event.preventDefault();
 
-        // Ensure that the email is not empty.
-        if (email !== "") {
+    // Get the current email entered by the user.
+    const email = name_field.value;
 
-            // Verify that the email does not already exist within the list.
-            if (!users.includes(email)) {
+    // Ensure that the email is not empty.
+    if (email !== "") {
 
-                // Build the email block.
-                const block = build_user_block(email);
+      // Verify that the email does not already exist within the list.
+      if (!users.includes(email)) {
 
-                // Append the block to the list.
-                shared_usernames_list.append(block);
+        // Build the email block.
+        const block = await build_user_block(email);
 
-                // Clear the content of the names field.
-                name_field.value = "";
+        // Append the block to the list.
+        shared_usernames_list.append(block);
 
-            }
+        // Clear the content of the names field.
+        name_field.value = "";
 
-        }
-
-        // Prevent the form from submitting.
-        event.preventDefault();
+      }
 
     }
+
+  }
 
 }
 
 
-function delete_email_block_click(event) {
+function delete_email_block_click(icon) {
 
-    // Get the email block.
-    const block = event.currentTarget.parentElement;
+  // Get the source.
+  let source = icon.source;
 
-    // Delete the email block.
-    block.remove();
+  // Remove the icon.
+  source.remove();
 
 }
 
@@ -65,66 +65,65 @@ function delete_email_block_click(event) {
 
 export function convert_shared_usernames_to_list(shared_elements_list, remove_ignored_users = true) {
 
-    // Declare local variables.
-    const emails = [];
+  // Declare local variables.
+  const emails = [];
 
-    // Iterate over each element within the shared email list.
-    shared_elements_list.querySelectorAll("li").forEach(email_block => {
-        if (!remove_ignored_users || (email_block.dataset['ignore'] === "false"))
-        emails.push(email_block.querySelector("span").innerHTML);
-    })
+  // Iterate over each element within the shared email list.
+  shared_elements_list.querySelectorAll(".user_icon").forEach(email_block => {
+    if (!remove_ignored_users || (email_block.dataset['enabled'] === "true"))
+    emails.push(email_block.dataset['username']);
+  })
 
-    return emails;
+  return emails;
 
 }
 
 
-export function preset_email_list(shared_usernames_list, users) {
+export async function preset_share_list(shared_usernames_list, users) {
 
-    // Get the email list object.
-    const usernames_list = document.getElementById(shared_usernames_list);
+  // Get the email list object.
+  const usernames_list = document.getElementById(shared_usernames_list);
 
-    // Add each email to the list.
-    users.forEach(user => {
+  // Remove all elements from the shared list.
+  usernames_list.innerHTML = "";
 
-        // Add the user to the block.
-        usernames_list.append(build_user_block(user, true));
+  // Add each email to the list.
+  users.forEach(async function (user) {
 
-    });
+    let block = await build_user_block(user, true);
+
+    // Add the user to the block.
+    usernames_list.append(block);
+
+  });
     
 }
 
 
-function build_user_block(user, ignore = false) {
+async function build_user_block(username, ignore = false) {
 
-    // Declare elements.
-    const block = document.createElement("li");
-    const title_block = document.createElement("span");
-    const delete_button = document.createElement("img");
+  // Declare elements.
+  let user_icon = null;
 
-    // Build the structure of the block.
-    block.append(title_block);
-    block.append(delete_button);
+  // Attempt to get the email hash.
+  let response = await fetch ("http://localhost:8000/user/icon", {
+    method: "PUT",
+    body: JSON.stringify({
+      username: username
+    })
+  });
+  let data = await response.json();  
+    
+  // Build the user icon.
+  user_icon = new UserIcon(username, data['hash']);
 
-    // Apply styling to the block elements.
-    block.className = "left-right-container";
-    delete_button.className = "right-container";
+  // Set the enable attribute of the icon.
+  user_icon.enabled = !ignore;
 
-    // Set up the delete button.
-    delete_button.src = "/static/icons/delete.svg";
-    delete_button.width = 10;
-    delete_button.height = 10;
+  // Add the event handler to the delete button.
+  user_icon.handle_close = delete_email_block_click;
 
-    // Set the email value of the user.
-    title_block.innerHTML = user;
-
-    // Set the data attribute.
-    block.dataset['ignore'] = ignore;
-
-    // Add the event handler to the delete button.
-    delete_button.addEventListener("click", delete_email_block_click);
-
-    // Return the block.
-    return block;
+  // Return the block.
+  return user_icon.build();
 
 }

@@ -10,6 +10,8 @@ from json import JSONDecoder
 from datetime import date
 from .users import UserRegistration
 
+from hashlib import sha256
+
 
 # Declare the necessary singletons.
 registration = UserRegistration()
@@ -222,6 +224,27 @@ def user_task_info(request, user_token):
   }
 
   return JsonResponse(data)
+
+
+@require_http_methods(['PUT'])
+@csrf_exempt
+def user_icon_info(request):
+  """API to get user icon hash."""
+
+  # Decode the request.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Ensure that the username is within the request.
+  if ('username' not in data):
+    return HttpResponse(status=400)
+
+  # Attempt to find the user.
+  user = get_object_or_404(User, username=data['username'])
+
+  # Get the user's email hash.
+  hash = sha256(user.email.encode("utf-8"))
+
+  return JsonResponse({'hash': hash.hexdigest()})
 
 
 def task_info(request, task_id):

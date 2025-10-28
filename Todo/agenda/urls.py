@@ -13,6 +13,7 @@ urlpatterns = [
   # General information API.
   path("user/groups", views.user_group_info, name="user-group-info"),
   path("user/tasks", views.user_task_info, name="user-task-info"),
+  path("user/icon", views.user_icon_info, name="user-icon-info"),
 
   # Task API.
   path("task/info/<int:task_id>", views.task_info, name="task-info"),
@@ -30,7 +31,7 @@ urlpatterns = [
 
   path("shared/info/<int:id>", views.shared_info, name="shared-info"),
   path("shared/edit/<int:id>", views.shared_edit, name="shared-edit"),
-  path("shared/new", views.shared_new, name="shared-new")
+  path("shared/new", views.shared_new, name="shared-new"),
 ]
 
 

@@ -5,7 +5,7 @@
 
 }
 
-.user_icon:hover {
+.user_icon[data-enabled="true"]:hover {
 
   content: url("http://localhost:8000/static/icons/delete.svg");
 
