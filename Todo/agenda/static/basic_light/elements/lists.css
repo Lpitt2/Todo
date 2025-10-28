@@ -22,11 +22,13 @@
 
 .grid-list {
 
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   gap: 10pt;
   
+  margin-block-start: 0px;
+  padding-inline-start: 0px;
+
   list-style: none;
-  flex-wrap: wrap;
 
 }

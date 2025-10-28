@@ -28,7 +28,7 @@ export class UserIcon {
 
     // Set the dataset attributes.
     this.#source.dataset['username'] = this.#username;
-    this.#source.dataset["enabled"] = this.#enabled;
+    this.#source.dataset['enabled'] = this.#enabled;
 
     // Add event handlers.
     this.#source.addEventListener("click", this._handle_user_click.bind(this));
