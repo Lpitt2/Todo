@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add the administration event handlers.
   document.getElementById("leave-group-button").addEventListener("click", handle_leave_common_board_click);
   document.getElementById("board_title_header").addEventListener("focusout", handle_board_rename);
+  document.getElementById("board_title_header").addEventListener("keydown", handle_board_rename_keypress);
 
   // Perform the initial rendering of the taskboard.
   render();
@@ -433,7 +434,7 @@ function handle_leave_common_board_click(event) {
 
 }
 
-function handle_board_rename(event) {
+async function handle_board_rename(event) {
 
   // Get the element values.
   const board_name = `${document.getElementById("board_title_header").innerText}`;
@@ -443,6 +444,15 @@ function handle_board_rename(event) {
   if (board_name.trim() === "") {
 
     alert("Board name cannot be empty.");
+
+    let response = await fetch(`http://localhost:8000/shared/info/${commonboard_id}`);
+    let data = await response.json();
+    
+    // Get the board header.
+    let header = await document.getElementById("board_title_header");
+    
+    // Reset the board title.
+    header.innerText = data['title'];
 
     return;
 
@@ -457,6 +467,17 @@ function handle_board_rename(event) {
   }).then(response => {
     connection.request(ISocket.UPDATE, CommonSocket.BOARD, null);
   });
+
+}
+
+function handle_board_rename_keypress(event) {
+
+  // Prevent the user from entering a new line character.
+  if (event.key === "Enter") {
+
+    event.preventDefault();
+
+  }
 
 }
 
