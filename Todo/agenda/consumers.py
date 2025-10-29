@@ -8,6 +8,7 @@ from typing import TypeVar, Generic
 
 # Declare singletons.
 registration = UserRegistration()
+user_sessions = dict()
 
 T = TypeVar('T')
 
@@ -274,6 +275,7 @@ class CommonComumer(WebsocketConsumer):
     self.group_name = None
     self.common_board_id = None
     self.common_board = None
+    self.user = None
 
     self.accept()
 
@@ -281,6 +283,19 @@ class CommonComumer(WebsocketConsumer):
 
     # Determine if the socket is in a group.
     if (self.group_name != None):
+
+      # Remove the user from the group.
+      user_sessions[self.group_name].remove(self.user.username)
+
+      # Send the user update to everyone within the group.
+      async_to_sync(self.channel_layer.group_send)(self.group_name, {
+        'type': "relay",
+        'message': JSONEncoder().encode({
+          'activity': "UPDATE",
+          'type': "USER",
+          'data': user_sessions[self.group_name]
+        })
+      })
 
       # Disconnect the user from the group.
       async_to_sync(self.channel_layer.group_discard)(self.group_name, self.channel_name)
@@ -390,7 +405,7 @@ class CommonComumer(WebsocketConsumer):
       return
 
     # Get the user from the registration system.
-    user = registration.get_user_from_token(user_token)
+    self.user = registration.get_user_from_token(user_token)
 
     # Attempt to get the commonboard object.
     self.common_board = self.get_object_or_404(CommonBoard, common_board_id)
@@ -401,7 +416,7 @@ class CommonComumer(WebsocketConsumer):
       return
 
     # Verify that the user is one of the owners of the common board.
-    if (not self.common_board.user_authorized(user)):
+    if (not self.common_board.user_authorized(self.user)):
 
       # Send error message to the user.
       self.send_error(401, f"User is not authorized to access common board id {common_board_id}")
@@ -409,8 +424,26 @@ class CommonComumer(WebsocketConsumer):
     # Set up the group name.
     self.group_name = f"Common-Board-{common_board_id}"
 
+    # Determine if the group is within the 'user_sessions' dictionary.
+    if (self.group_name not in user_sessions):
+
+      user_sessions[self.group_name] = list()
+
+    # Add the current user to the 'user_sessions' variable.
+    user_sessions[self.group_name].append(self.user.username)
+
     # Connect to the group.
     async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
+
+    # Send the initial connection message to everyone within the group.
+    async_to_sync(self.channel_layer.group_send)(self.group_name, {
+      'type': "relay",
+      'message': JSONEncoder().encode({
+        'activity': "UPDATE",
+        'type': "USER",
+        'data': user_sessions[self.group_name]
+      })
+    })
 
   def handle_group_create(self, id):
     """Handles new group creation."""

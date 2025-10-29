@@ -207,6 +207,7 @@ export class CommonSocket extends ISocket {
   #common_id = null;
 
   #on_board_update;
+  #on_user_update;
 
   constructor(url, user_token, common_id) {
 
@@ -223,10 +224,11 @@ export class CommonSocket extends ISocket {
 
 
 
-  /**/
+  /* Accessor Methods. */
   
 
   set on_board_update(on_board_update) { this.#on_board_update = on_board_update; }
+  set on_user_update(on_user_update) { this.#on_user_update = on_user_update; }
 
 
 
@@ -254,6 +256,11 @@ export class CommonSocket extends ISocket {
 
         // Call the board update callback.
         this.#on_board_update(data);
+
+      } else if (type === "USER" && activity === "UPDATE") {
+
+        // Call the board update callback.
+        this.#on_user_update(data);
 
       }
 

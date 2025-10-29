@@ -3,6 +3,7 @@ import { build_task_from_json } from "../modules/task.js";
 import { CommonSocket, ISocket } from "../modules/user_socket.js";
 import * as shared_box from "../modules/share_box.js";
 import * as Driver from "../modules/taskboard_driver.js" ;
+import { UserIcon } from "../modules/user_icon.js";
 
 let taskboard = null;
 let connection = null;
@@ -47,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   connection.on_group_delete = Driver.handle_delete_group_socket;
   connection.on_error = Driver.handle_error_socket;
   connection.on_board_update = handle_edit_common_board;
+  connection.on_user_update = handle_user_update;
 
   // Add the event handler for the share user name box.
   document.getElementById("add-user-share-name-field").addEventListener("keydown", shared_box.handle_keydown_event_share_names_field);
@@ -408,7 +410,7 @@ function handle_share_submission(event) {
 
 
 
-/* Leave common board administration events. */
+/* Common board administration events. */
 
 
 function handle_leave_common_board_click(event) {
@@ -454,6 +456,35 @@ function handle_board_rename(event) {
     })
   }).then(response => {
     connection.request(ISocket.UPDATE, CommonSocket.BOARD, null);
+  });
+
+}
+
+async function handle_user_update(users) {
+
+  // Get the active users list.
+  const active_users_list = document.getElementById("active_users_list");
+  
+  // Remove the users from the active users list.
+  active_users_list.innerHTML = "";
+
+  // Add the users to the active users list.
+  users.forEach(await async function(user) {
+
+    let response = await fetch ("http://localhost:8000/user/icon", {
+      method: "PUT",
+      body: JSON.stringify({
+        username: user
+      })
+    });
+    let data = await response.json();
+    
+      // Create the user icon.
+      const icon = new UserIcon(user, data['hash']);
+
+      // Build the user icon.
+      active_users_list.append(icon.build());
+
   });
 
 }
