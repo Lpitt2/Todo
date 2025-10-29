@@ -173,6 +173,13 @@ def shared_view(request, id):
   return render(request, "agenda/shared_commonboard.html", {'user_token': token, 'user_boards': user_boards, 'common_board': common_group})
 
 
+@login_required(login_url="/login")
+def settings_view(request):
+  """Displays the user's settings page."""
+
+  return render(request, "agenda/settings.html", {'common_boards': [board for board in request.user.commonboard_set.all()]})
+
+
 
 
 

@@ -1,0 +1,102 @@
+{% extends './base/main_page.html' %}
+
+{% load static %}
+{% load user %}
+
+{% block metadata %}
+
+{% endblock %}
+
+{% block content %}
+  <div class="layout-body-split">
+    <div class="layout-center-body">
+      <h1 class="center">Settings</h1>
+
+      <p></p>
+
+      <hr/>
+
+      <h3>Account</h3>
+
+      <p>
+
+        <!--User Icon-->
+        <a href="https://wordpress.com/log-in/link?client_id=1854&redirect_to=https%3A%2F%2Fpublic-api.wordpress.com%2Foauth2%2Fauthorize%3Fclient_id%3D1854%26response_type%3Dcode%26blog_id%3D0%26state%3D765a818b8a36d4768441b8267eeb18cf2e7b20431583344fedeec08530d46957%26redirect_uri%3Dhttps%253A%252F%252Fgravatar.com%252Fconnect%252F%253Faction%253Drequest_access_token%26from-calypso%3D1">{% user_avatar request.user false %}</a>
+
+        <!--User Information-->
+        <table class="hidden data-table">
+          <tbody>
+            <tr>
+              <td>Username</td>
+              <td>{{ request.user.username }}</td>
+            </tr>
+            <tr>
+              <td>Email</td>
+              <td>{{ request.user.email }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </p>
+
+      <hr/>
+
+      <h3>Appearence</h3>
+
+      <p>
+
+        <div>
+          <span style="font-weight: bold;">Task Details</span>
+
+          <table class="hidden data-table">
+            <tbody>
+              <tr>
+                <td>Description</td>
+                <td>
+                  <input type="checkbox">
+                </td>
+              </tr>
+              <tr>
+                <td>Due Date</td>
+                <td>
+                  <input type="checkbox">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <select>
+            <option>Compact</option>
+            <option>Spacious</option>
+          </select>
+        </div>
+
+      </p>
+
+      <hr/>
+
+      <h3>Alerts</h3>
+
+      <p>
+
+        <table class="hidden data-table">
+          <tbody>
+            {% for board in common_boards %}
+
+            <tr>
+
+              <td>{{ board.title }}</td>
+              <td><input type="checkbox" {% if board.alerts %}checked{% endif %}></td>
+
+            </tr>
+
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </p>
+    </div>
+  </div>
+{% endblock %}

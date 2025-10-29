@@ -9,6 +9,7 @@ class CommonBoard(models.Model):
 
   # Fields.
   title = models.CharField("title", max_length=128)
+  alerts = models.BooleanField("alerts", default=True)
 
   # Relationships.
   owners = models.ManyToManyField(User)

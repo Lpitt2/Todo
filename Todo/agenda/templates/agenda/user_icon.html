@@ -1,4 +1,4 @@
 <div style="padding: 0px; display: flex; flex-direction: row; gap: 10pt; height: 40px;">
-  <span style="display: flex; flex-direction: column; justify-content: center; align-items: center;">{{ username }}</span>
+  {% if display_name %}<span style="display: flex; flex-direction: column; justify-content: center; align-items: center;">{{ username }}</span>{% endif %}
   <img width="40" style="border-radius: 40px;" src="{{ url }}">
 </div>

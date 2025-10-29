@@ -18,7 +18,7 @@
 
     <button class="open-dialog-button button-primary" data-target="new-group-dialog">Create New Group</button>
 
-    <button id="add-users-button" class="open-dialog-button button-primary" data-target="share-dialog">Share</button>
+    <button id="add-users-button" class="open-dialog-button button-primary" data-target="share-dialog">Invite</button>
     
     <button id="leave-group-button" class="button-warning common-board-leave-button">Leave Group</button>
 
@@ -151,17 +151,17 @@
 
 </dialog>
 
-<!--Share dialog-->
+<!--Invite dialog-->
 <dialog closedBy="any" id="share-dialog">
 
   <form id="share-form">
 
-    <h4 class="center">Share</h4>
+    <h4 class="center">Invite</h4>
 
     <!--Users list.-->
     <div style="margin: 10pt;">
       <ul class="grid-list" id="add-user-share-name-list"></ul>
-      <input type="text" placeholder="Users to Share With" id="add-user-share-name-field"/>
+      <input type="text" placeholder="Users to Invite" id="add-user-share-name-field"/>
     </div>
 
     <button class="button-accept">Add Users</button>

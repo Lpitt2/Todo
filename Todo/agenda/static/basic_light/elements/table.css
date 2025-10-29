@@ -1,0 +1,11 @@
+.hidden {
+
+  border: none;
+
+}
+
+.data-table > tbody > tr > td:first-child {
+
+  font-weight: bold;
+
+}

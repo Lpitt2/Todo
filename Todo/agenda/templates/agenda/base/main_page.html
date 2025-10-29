@@ -23,6 +23,7 @@
       {% if user.is_authenticated %}
       <li><a href="{% url 'home' %}"><button class="button-primary">Home</button></a></li>
       <li><a href="{% url 'shared' 0 %}"><button class="button-primary">Shared</button></a></li>
+      <li><a href="{% url 'settings' %}"><button class="button-primary">Settings</button></a></li>
       {% endif %}
 
     </ul>

@@ -7,7 +7,7 @@ register = template.Library()
 
 
 @register.inclusion_tag("agenda/user_icon.html")
-def user_avatar(user):
+def user_avatar(user, display_name = True):
   """Returns the address of the user's gravitar image."""
 
   # Declare base url.
@@ -20,4 +20,4 @@ def user_avatar(user):
   # Hash the user's email address.
   email_hash = sha256(user.email.encode("utf-8"))
 
-  return { 'url': f"{BASE_URL}/{email_hash.hexdigest()}", 'username': user.username.capitalize() }
+  return { 'url': f"{BASE_URL}/{email_hash.hexdigest()}", 'username': user.username.capitalize(), 'display_name': display_name }

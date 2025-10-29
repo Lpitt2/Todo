@@ -9,6 +9,7 @@ urlpatterns = [
   path("shared/<int:id>", views.shared_view, name="shared"),
   path("login", views.login_view, name="login"),
   path("register", views.register_view, name="register"),
+  path("settings", views.settings_view, name="settings"),
 
   # General information API.
   path("user/groups", views.user_group_info, name="user-group-info"),
