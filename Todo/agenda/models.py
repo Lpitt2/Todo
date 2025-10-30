@@ -5,6 +5,20 @@ from django.contrib.auth.models import User
 
 
 
+class Setting(models.Model):
+  
+  # Choices.
+  viewing_choices = {
+    1: "DEFAULT",
+    2: "COMPACT"
+  }
+
+  # Fields.
+  user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+  view = models.IntegerField("view", choices=viewing_choices, default=1)
+
+
+
 class CommonBoard(models.Model):
 
   # Fields.
@@ -79,3 +93,18 @@ class Task(models.Model):
  
     ordering = [models.F("completion_status").asc(), models.F("due_date").asc(nulls_last=True)]
 
+
+
+class Invite(models.Model):
+  
+  # Fields.
+  link_id = models.CharField("link_id", max_length=36, unique=True)
+  expiration = models.DateField("expiration")
+
+  # Relationships.
+  common_board = models.ForeignKey(CommonBoard, on_delete=models.DO_NOTHING)
+
+  def generate_link_id(self):
+    """Generates a unique link id."""
+
+    

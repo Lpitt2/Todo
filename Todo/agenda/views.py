@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from .models import *
 from json import JSONDecoder
@@ -116,6 +115,11 @@ def register_view(request):
         # Save the user.
         user.save()
 
+        # Create the user settings.
+        settings = Setting()
+        settings.user = user
+        settings.save()
+
         # Log the user in.
         login(request, user)
 
@@ -177,7 +181,7 @@ def shared_view(request, id):
 def settings_view(request):
   """Displays the user's settings page."""
 
-  return render(request, "agenda/settings.html", {'common_boards': [board for board in request.user.commonboard_set.all()]})
+  return render(request, "agenda/settings.html", {'common_boards': [board for board in request.user.commonboard_set.all()], 'settings': Setting.objects.get(user=request.user)})
 
 
 

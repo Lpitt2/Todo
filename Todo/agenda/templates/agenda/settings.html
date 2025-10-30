@@ -4,7 +4,7 @@
 {% load user %}
 
 {% block metadata %}
-
+  <script type="module" src="{%  static 'controllers/settings_page.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -37,6 +37,8 @@
           </tbody>
         </table>
 
+        <button class="button-warning">Delete Account</button>
+
       </p>
 
       <hr/>
@@ -67,9 +69,9 @@
         </div>
 
         <div>
-          <select>
-            <option>Compact</option>
-            <option>Spacious</option>
+          <select id="view-selector">
+            <option {% if settings.view == 1 %}selected{% endif %}>Default</option>
+            <option {% if settings.view == 2 %}selected{% endif %}>Compact</option>
           </select>
         </div>
 
@@ -81,20 +83,26 @@
 
       <p>
 
-        <table class="hidden data-table">
-          <tbody>
-            {% for board in common_boards %}
+        <form id="alert-form" method="PUT">
 
-            <tr>
+          <table class="hidden data-table">
+            <tbody>
+              {% for board in common_boards %}
 
-              <td>{{ board.title }}</td>
-              <td><input type="checkbox" {% if board.alerts %}checked{% endif %}></td>
+              <tr>
 
-            </tr>
+                <td>{{ board.title }}</td>
+                <td><input type="checkbox" {% if board.alerts %}checked{% endif %}></td>
 
-            {% endfor %}
-          </tbody>
-        </table>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <button class="button-accept">Save Changes</button>
+
+        </form>
 
       </p>
     </div>
