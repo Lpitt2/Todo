@@ -1,15 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect, get_object_or_404
+from django.core import mail
 from django.http import HttpResponse, JsonResponse
 from .models import *
-from json import JSONDecoder
-from datetime import date
 from .users import UserRegistration
 
+from datetime import date, datetime
 from hashlib import sha256
+from json import JSONDecoder
 
 
 # Declare the necessary singletons.
@@ -184,6 +185,82 @@ def settings_view(request):
   return render(request, "agenda/settings.html", {'common_boards': [board for board in request.user.commonboard_set.all()], 'settings': Setting.objects.get(user=request.user)})
 
 
+
+# Alert API.
+
+@login_required(login_url="/login")
+def alert_invite_info(request):
+  """Returns the user's invitations to shared groups."""
+
+  # Attempt to get all invites for the user.
+  invites = Invite.objects.filter(invited_user=request.user)
+
+  return JsonResponse({
+    'invites': [ {
+      'id': invite.id,
+      'title': invite.common_board.title
+    } for invite in invites ]
+  })
+
+
+@login_required(login_url="/login")
+@require_http_methods(["PUT"])
+@csrf_exempt
+def alert_dismiss(request):
+  """Dismisses an alert."""
+
+  # Parse the request.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Ensure that the relavent fields are present in the request.
+  if ('type' not in data or 'id' not in data):
+    return HttpResponse(status=400)
+
+  alert = None
+
+  # Determine the type of alert being dismissed.
+  if (data['type'] == "INVITE"):
+    
+    # Attempt to find the invite.
+    alert = get_object_or_404(Invite, id=data['id'])
+
+  elif (data['type'] == "TASK"):
+    pass
+
+  # Delete the alert.
+  if (alert != None):
+    alert.delete()
+
+  return HttpResponse(status=200)
+
+
+@login_required(login_url="/login")
+@require_http_methods(["PUT"])
+@csrf_exempt
+def alert_invite_accept(request):
+  """Handles the user accepting an invite."""
+
+  # Extract the request data.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Ensure that the required data is present.
+  if ('id' not in data):
+    return HttpResponse(status=400)
+
+  # Attempt to find the invite object.
+  invite = get_object_or_404(Invite, id=data['id'])
+
+  # Ensure that the requesting user is valid.
+  if (invite.invited_user != request.user):
+    return HttpResponse(status=400)
+
+  # Add the user to the common board.
+  invite.common_board.owners.add(request.user)
+
+  # Delete the invite object.
+  invite.delete()
+
+  return HttpResponse(status=200)
 
 
 
@@ -617,9 +694,17 @@ def shared_edit(request, id):
       # Get the user object.
       try:
 
-        common_board.owners.add(User.objects.get(username=user))
+        # common_board.owners.add(User.objects.get(username=user))
 
-      except (User.DoesNotExist):
+        # Determine if the user has already been added to the group.
+        user_obj = User.objects.get(username=user)
+        if (not common_board.user_authorized(user_obj)):
+
+          invite = Invite(common_board=common_board, invited_user=user_obj)
+
+          invite.save()
+
+      except(User.DoesNotExist):
 
         pass
 

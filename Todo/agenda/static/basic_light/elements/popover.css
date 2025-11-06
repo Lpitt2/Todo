@@ -1,0 +1,22 @@
+div[popover] {
+
+  /* Styling. */
+  background-color: #dddddd;
+  border-radius: 6pt;
+  border: none;
+
+}
+
+div[popover].right {
+
+  position: absolute;
+  inset: unset;
+  top: 10px;
+  bottom: 10px;
+  right: 10px;
+
+  /* Sizing */
+  height: 95%;
+  width: 35%;
+
+}

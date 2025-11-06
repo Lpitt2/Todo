@@ -7,7 +7,7 @@ dialog {
 
 }
 
-::backdrop {
+dialog::backdrop {
 
   
   backdrop-filter: blur(5px);

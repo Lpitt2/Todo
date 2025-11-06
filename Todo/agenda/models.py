@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from uuid import uuid4
 
 
 
@@ -98,13 +98,7 @@ class Task(models.Model):
 class Invite(models.Model):
   
   # Fields.
-  link_id = models.CharField("link_id", max_length=36, unique=True)
-  expiration = models.DateField("expiration")
+  invited_user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
 
   # Relationships.
   common_board = models.ForeignKey(CommonBoard, on_delete=models.DO_NOTHING)
-
-  def generate_link_id(self):
-    """Generates a unique link id."""
-
-    

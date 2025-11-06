@@ -30,6 +30,13 @@ button {
 
 }
 
+.hidden-button {
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  background-color: transparent;
+}
+
 
 /* Basic Button Styling.*/
 

@@ -1,4 +1,6 @@
 <div style="padding: 0px; display: flex; flex-direction: row; gap: 10pt; height: 40px;">
   {% if display_name %}<span style="display: flex; flex-direction: column; justify-content: center; align-items: center;">{{ username }}</span>{% endif %}
-  <img width="40" style="border-radius: 40px;" src="{{ url }}">
+  <button {% if popovertargetname != None %}popovertarget="{{ popovertargetname }}"{% endif %} class="hidden-button">
+    <img width="40" style="border-radius: 40px;" src="{{ url }}">
+  </button>
 </div>

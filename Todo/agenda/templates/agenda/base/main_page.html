@@ -8,7 +8,9 @@
 <head>
   <title>Agenda - {% block title %}{% endblock %}</title>
   {% block metadata %}{% endblock %}
+  <script type="module" src="{% static 'controllers/base_controller.js' %}"></script>
   <link rel="stylesheet" href="{% static 'basic_light/basic_light.css' %}">
+  <link rel="stylesheet" href="{% static 'alert_box.css' %}">
 </head>
 
 <body class="layout-page">
@@ -33,11 +35,21 @@
       <li><a href="{% url 'login' %}"><button class="button-primary">Log In</button></a></li>
       <li><a href="{% url 'register' %}"><button class="button-primary">Register</button></a></li>
       {% else %}
-      <li>{% user_avatar request.user %}</li>
+      <li>
+        {% user_avatar request.user display_name=True popover_target_name="alerts_popover" %}
+      </li>
       {% endif %}
     </ul>
 
   </nav>
+
+  {% if user.is_authenticated %}
+  <div class="right" id="alerts_popover" popover>
+    <h2 class="center">Alerts</h2>
+    <hr/>
+    <div id="alert_list"></div>
+  </div>
+  {% endif %}
 
   <div class="layout-body">
     {% block content %}{% endblock %}

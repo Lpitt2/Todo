@@ -1,0 +1,16 @@
+.alert-box {
+
+  border-radius: 2pt;
+  border: 1px solid #55d0ff;
+  background-color: #77e0ff;
+
+  margin: 16pt;
+
+}
+
+.alert-box-button-group {
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+}
