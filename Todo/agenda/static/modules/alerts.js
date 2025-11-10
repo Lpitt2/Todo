@@ -135,6 +135,13 @@ export class InviteAlertBox extends AlertBox {
 
 };
 
+
+export class OverdueAlertBox extends AlertBox {
+
+  constructor(id, title, description) { super(id, title, description, "OVERDUE"); }
+
+};
+
 // http://localhost:8000/alerts/dismiss/<alert-id> -> Invite, TaskAlert
 // http://localhost:8000/alerts/invites/accept/<alert-id> -> Invite
 // Select "Show Details" Displays the task information -> TaskAlert

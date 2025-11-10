@@ -1,4 +1,4 @@
-import { InviteAlertBox } from "../modules/alerts.js"
+import { InviteAlertBox, OverdueAlertBox } from "../modules/alerts.js"
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -19,13 +19,26 @@ async function handle_alerts_open(event) {
   if (event.newState === "open") {
 
     // Request all of the user's invites.
-    let request = await fetch("http://localhost:8000/alerts/invites");
-    let data = await request.json();
+    let invite_request = await fetch("http://localhost:8000/alerts/invites");
+    let invite_data = await invite_request.json();
 
     // Iterate over the invites.
-    data['invites'].forEach(invite => {
+    invite_data['invites'].forEach(invite => {
       
       let box = new InviteAlertBox(invite.id, invite.title);
+
+      alert_list.append(box.build());
+
+    });
+
+    // Request all of the user's due tasks.
+    let task_request = await fetch("http://localhost:8000/alerts/tasks");
+    let task_data = await task_request.json();
+
+    // Add each task box to the alert list.
+    task_data['tasks'].forEach(task => {
+
+      let box = new OverdueAlertBox(task['id'], task['title'], task['description']);
 
       alert_list.append(box.build());
 

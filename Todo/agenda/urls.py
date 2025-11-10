@@ -12,6 +12,7 @@ urlpatterns = [
   path("settings", views.settings_view, name="settings"),
 
   # Alert API.
+  path("alerts/tasks", views.alert_task_info, name="alert-task-info"),
   path("alerts/invites", views.alert_invite_info, name="alert-invite-info"),
   path("alerts/dismiss", views.alert_dismiss, name="alert-dismiss"),
   path("alerts/invite/accept", views.alert_invite_accept, name="alert-invite-accept"),

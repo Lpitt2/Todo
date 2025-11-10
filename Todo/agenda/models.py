@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from uuid import uuid4
+from datetime import date
 
 
 
@@ -29,8 +30,20 @@ class CommonBoard(models.Model):
   owners = models.ManyToManyField(User)
 
   def user_authorized(self, user : User) -> bool:
-    '''Determines if the specified user is one of the owners of the common board.'''
+    """Determines if the specified user is one of the owners of the common board."""
     return self.owners.all().filter(pk=user.id).exists()
+
+  def get_overdue_tasks(self):
+    """Returns tasks whose due date exceeds today."""
+
+    # Get the overdue tasks from the commonboard.
+    tasks = list()
+    for group in TaskGroup.objects.filter(common_board=self.id):
+
+      # Get the overdue tasks of the current group.
+      tasks += group.get_overdue_tasks()
+
+    return tasks
 
 
 
@@ -55,6 +68,23 @@ class TaskGroup(models.Model):
       'title': self.title
     }
 
+  def get_overdue_tasks(self):
+    """Returns tasks whose due date exceeds today."""
+
+    # Get today's date.
+    today = date.today()
+
+    # Find all tasks that are past-due.
+    tasks = list()
+    for task in Task.objects.filter(group=self.id):
+
+      # Determine if the current task is late.
+      if (task.due_date != None and task.due_date < today):
+
+        tasks.append(task)
+
+    return tasks
+
 
 
 class Task(models.Model):
@@ -71,7 +101,9 @@ class Task(models.Model):
 
   def user_authorized(self, user : User) -> bool:
     """Determines if the specified user is one of the owners of the task."""
+
     return ((self.owner == user) or (self.group.user_authorized(user)))
+
 
   def get_task_as_dictionary(self):
     """Returns a JSON object of the task information."""
@@ -88,6 +120,13 @@ class Task(models.Model):
       'complete': self.completion_status,
       'group': self.group.id
     }
+
+
+  def is_overdue(self):
+    """Returns true if the task is overdue and false otherwise."""
+
+    return ((self.due_date != None) and (self.due_date < date.today()))
+
 
   class Meta:
  

@@ -189,6 +189,39 @@ def settings_view(request):
 # Alert API.
 
 @login_required(login_url="/login")
+def alert_task_info(request):
+  """Returns the user's task alerts."""
+
+  # Declare local variables.
+  tasks = list()
+
+  # Get the overdue tasks of the user's dashboard.
+  for task in Task.objects.filter(owner=request.user):
+
+    # Determine if the task is overdue.
+    if ((task.group.common_board == None) and task.is_overdue()):
+
+      tasks.append(task)
+
+  # Get the overdue tasks of the common boards that the user is involved in.
+  for board in CommonBoard.objects.filter(owners=request.user):
+
+    # Get the task groups from the common board.
+    for group in TaskGroup.objects.filter(common_board=board):
+
+      # Get the overdue tasks.
+      tasks += group.get_overdue_tasks()
+
+  return JsonResponse({
+    "tasks": [{
+      "id": task.id,
+      "title": task.title,
+      "description": task.description
+    } for task in tasks]
+  })
+
+
+@login_required(login_url="/login")
 def alert_invite_info(request):
   """Returns the user's invitations to shared groups."""
 
