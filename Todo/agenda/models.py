@@ -6,25 +6,11 @@ from datetime import date
 
 
 
-class Setting(models.Model):
-  
-  # Choices.
-  viewing_choices = {
-    1: "DEFAULT",
-    2: "COMPACT"
-  }
-
-  # Fields.
-  user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-  view = models.IntegerField("view", choices=viewing_choices, default=1)
-
-
 
 class CommonBoard(models.Model):
 
   # Fields.
   title = models.CharField("title", max_length=128)
-  alerts = models.BooleanField("alerts", default=True)
 
   # Relationships.
   owners = models.ManyToManyField(User)
@@ -44,6 +30,31 @@ class CommonBoard(models.Model):
       tasks += group.get_overdue_tasks()
 
     return tasks
+
+
+
+class ViewSetting(models.Model):
+  
+  # Viewing Choices.
+  viewing_choices = {
+    1: "DEFAULT",
+    2: "COMPACT"
+  }
+
+  # Fields.
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  view = models.IntegerField("view", choices=viewing_choices, default=1)
+  display_description = models.BooleanField("description", default=False)
+  display_due_date = models.BooleanField("due_date", default=False)
+
+
+
+class CommonBoardSetting(models.Model):
+
+  # Fields.
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  board = models.ForeignKey(CommonBoard, on_delete=models.CASCADE)
+  show_alerts = models.BooleanField("show_alerts", default=True)
 
 
 

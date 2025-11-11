@@ -15,6 +15,9 @@ async function handle_alerts_open(event) {
 
   const alert_list = document.getElementById("alert_list");
 
+  // Clear the content list.
+  alert_list.innerHTML = "";
+  
   // Determine if the user is opening the alert panel.
   if (event.newState === "open") {
 

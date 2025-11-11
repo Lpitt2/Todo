@@ -6,7 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Set the event handlers for the elements.
   view_selector.addEventListener("change", handle_view_selector_change);
-  alert_form.addEventListener("submit", handle_alert_form_submit);
+  document.querySelectorAll(".common-board-alert-setting-options").forEach(option => {
+    option.addEventListener("click", handle_alert_option_change);
+  });
 
 });
 
@@ -18,6 +20,22 @@ function handle_view_selector_change() {
 
 }
 
-function handle_alert_form_submit(event) {
-  event.preventDefault();
+function handle_alert_option_change(event) {
+ 
+  // Get the selected option.
+  const option = event.target;
+
+  // Get the id and alert status.
+  const id = option.dataset['id'];
+  const status = option.checked;
+
+  // Set the request to the server.
+  fetch ("http://localhost:8000/settings/alerts", {
+    method: "PUT",
+    body: JSON.stringify({
+      id: id,
+      status: status
+    })
+  });
+
 }

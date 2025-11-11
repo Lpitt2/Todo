@@ -11,6 +11,9 @@ urlpatterns = [
   path("register", views.register_view, name="register"),
   path("settings", views.settings_view, name="settings"),
 
+  # Settings.
+  path("settings/alerts", views.settings_update_alerts, name="settings-alerts-update"),
+
   # Alert API.
   path("alerts/tasks", views.alert_task_info, name="alert-task-info"),
   path("alerts/invites", views.alert_invite_info, name="alert-invite-info"),

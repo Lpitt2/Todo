@@ -117,7 +117,7 @@ def register_view(request):
         user.save()
 
         # Create the user settings.
-        settings = Setting()
+        settings = ViewSetting()
         settings.user = user
         settings.save()
 
@@ -182,7 +182,51 @@ def shared_view(request, id):
 def settings_view(request):
   """Displays the user's settings page."""
 
-  return render(request, "agenda/settings.html", {'common_boards': [board for board in request.user.commonboard_set.all()], 'settings': Setting.objects.get(user=request.user)})
+  # Attempt to get the common board settings.
+  settings = []
+  try:
+
+    settings = [ { "id": setting.id, "title": setting.board.title, "show_alerts": setting.show_alerts } for setting in CommonBoardSetting.objects.filter(user=request.user) ]
+
+  except:
+
+    pass
+
+  return render(request, "agenda/settings.html", {'common_boards': [board for board in request.user.commonboard_set.all()], 'settings': settings})
+
+
+
+
+
+# Settings.
+
+@login_required(login_url="/login")
+@require_http_methods(["PUT"])
+@csrf_exempt
+def settings_update_alerts(request):
+  """Handles updating settings information."""
+
+  # Extract the request contents.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Ensure that the request has all required fields.
+  if ("id" not in data or "status" not in data):
+    return HttpResponse(status=400)
+
+  # Attempt to get the common board settings object.
+  settings = get_object_or_404(CommonBoardSetting, id=data['id'])
+
+  # Ensure that the setting is owned by the requesting user.
+  if (settings.user != request.user):
+    return HttpResponse(status=403)
+
+  # Update the setting.
+  settings.show_alerts = data['status']
+  settings.save()
+
+  return HttpResponse(status=200)
+
+
 
 
 
@@ -205,6 +249,23 @@ def alert_task_info(request):
 
   # Get the overdue tasks of the common boards that the user is involved in.
   for board in CommonBoard.objects.filter(owners=request.user):
+
+    # Attempt to get the board setting for the current user and board.
+    setting = None
+    try:
+      
+      setting = CommonBoardSetting.objects.filter(user=request.user, board=board)[0]
+
+    except:
+      
+      setting = CommonBoardSetting()
+      setting.user = request.user
+      setting.board = board
+      setting.save()
+
+    # Determine if the user's settings allow notifications for this common board.
+    if (not setting.show_alerts):
+      continue
 
     # Get the task groups from the common board.
     for group in TaskGroup.objects.filter(common_board=board):
@@ -290,10 +351,18 @@ def alert_invite_accept(request):
   # Add the user to the common board.
   invite.common_board.owners.add(request.user)
 
+  # Create a common board settings entry for the user.
+  settings = CommonBoardSetting()
+  settings.user = request.user
+  settings.board = invite.common_board
+  settings.save()
+
   # Delete the invite object.
   invite.delete()
 
   return HttpResponse(status=200)
+
+
 
 
 

@@ -83,26 +83,20 @@
 
       <p>
 
-        <form id="alert-form" method="PUT">
+        <table class="hidden data-table">
+          <tbody>
+            {% for setting in settings %}
 
-          <table class="hidden data-table">
-            <tbody>
-              {% for board in common_boards %}
+            <tr>
 
-              <tr>
+              <td>{{ setting.title }}</td>
+              <td><input class="common-board-alert-setting-options" data-id="{{ setting.id }}" type="checkbox" {% if setting.show_alerts %}checked{% endif %}></td>
 
-                <td>{{ board.title }}</td>
-                <td><input type="checkbox" {% if board.alerts %}checked{% endif %}></td>
+            </tr>
 
-              </tr>
-
-              {% endfor %}
-            </tbody>
-          </table>
-
-          <button class="button-accept">Save Changes</button>
-
-        </form>
+            {% endfor %}
+          </tbody>
+        </table>
 
       </p>
     </div>
