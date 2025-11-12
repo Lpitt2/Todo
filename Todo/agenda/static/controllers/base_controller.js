@@ -5,6 +5,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // Get the alerts panel.
   const alerts_panel = document.getElementById("alerts_popover");
 
+  // Extract the date from the local storage.
+  let expiration = localStorage.getItem("date");
+
+  // Determine if the items of local storage need to be removed.
+  if (expiration !== null) {
+
+    // Convert the string into a date time object.
+    let date = new Date(expiration);
+    let today = new Date();
+
+    if ((date.getFullYear() !== today.getFullYear()) || (date.getMonth() !== today.getMonth()) || (date.getDate() !== today.getDate())) {
+
+      localStorage.clear();
+
+    }
+
+  }
+
+  // Set today in localstorage.
+  localStorage.setItem("date", new Date().toString());
+
   // Add event listeners to the popover.
   alerts_panel.addEventListener("toggle", handle_alerts_open);
 
@@ -27,10 +48,10 @@ async function handle_alerts_open(event) {
 
     // Iterate over the invites.
     invite_data['invites'].forEach(invite => {
-      
-      let box = new InviteAlertBox(invite.id, invite.title);
 
-      alert_list.append(box.build());
+        let box = new InviteAlertBox(invite.id, invite.title);
+
+        alert_list.append(box.build());
 
     });
 
@@ -41,9 +62,14 @@ async function handle_alerts_open(event) {
     // Add each task box to the alert list.
     task_data['tasks'].forEach(task => {
 
-      let box = new OverdueAlertBox(task['id'], task['title'], task['description']);
+      // Ensure that the alert has not already been silenced.
+      if (localStorage.getItem(`task-${task['id']}`) === null) {
 
-      alert_list.append(box.build());
+        let box = new OverdueAlertBox(task['id'], task['title'], task['description']);
+
+        alert_list.append(box.build());
+
+      }
 
     });
 

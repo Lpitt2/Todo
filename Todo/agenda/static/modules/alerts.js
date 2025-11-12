@@ -18,19 +18,13 @@ class AlertBox {
   get id() { return this.#id; }
   get title() { return this.#title; }
   get description() { return this.#description; }
+  get type() { return this.#type; }
   get source() { return this.#source; }
 
   async dismiss() {
 
-    // Make request to server to dismiss the alert.
-    await fetch(`http://localhost:8000/alerts/dismiss`, {
-        method: "PUT",
-        body: JSON.stringify({
-          'type': this.#type,
-          'id': this.#id
-        })
-      }
-    );
+    // Add the task id to the local storage.
+    localStorage.setItem(`task-${this.#id}`, true);
 
     // Delete the alert box.
     this.#source.remove();
@@ -82,6 +76,22 @@ export class InviteAlertBox extends AlertBox {
 
   constructor(id, title) { super(id, title, `You have been invited to ${title} group.`, "INVITE"); }
 
+
+  async dismiss() {
+
+    super.dismiss();
+
+    // Make request to server to dismiss the alert.
+    await fetch(`http://localhost:8000/alerts/dismiss`, {
+        method: "PUT",
+        body: JSON.stringify({
+          'type': this.type,
+          'id': this.id
+        })
+      }
+    );
+
+  }
 
   async accept() {
 
@@ -141,7 +151,3 @@ export class OverdueAlertBox extends AlertBox {
   constructor(id, title, description) { super(id, title, description, "OVERDUE"); }
 
 };
-
-// http://localhost:8000/alerts/dismiss/<alert-id> -> Invite, TaskAlert
-// http://localhost:8000/alerts/invites/accept/<alert-id> -> Invite
-// Select "Show Details" Displays the task information -> TaskAlert

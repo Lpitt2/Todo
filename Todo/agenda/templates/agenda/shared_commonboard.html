@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% block title %}- {{ common_board.title }}{% endblock %}
+
 {% block taskboard_metadata %}
   <script type="module" src="{% static 'controllers/commonboard_page.js' %}"></script>
 {% endblock %}

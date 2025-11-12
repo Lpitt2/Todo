@@ -796,8 +796,6 @@ def shared_edit(request, id):
       # Get the user object.
       try:
 
-        # common_board.owners.add(User.objects.get(username=user))
-
         # Determine if the user has already been added to the group.
         user_obj = User.objects.get(username=user)
         if (not common_board.user_authorized(user_obj)):
@@ -868,6 +866,9 @@ def shared_new(request):
   # Add the current user to the owners field.
   common_group.owners.add(request.user)
 
+  # Save the common board.
+  common_group.save()
+
   # Load the users.
   if ('users' in data and type(data['users']) == type(list())):
     for username in data['users']:
@@ -880,15 +881,13 @@ def shared_new(request):
         # Find the user by their username.
         user = User.objects.get(username=username)
 
-        # Add the user to the common group.
-        common_group.owners.add(user)
+        # Create an invite.
+        invite = Invite(common_board=common_group, invited_user=user)
+        invite.save()
 
       except(User.DoesNotExist):
 
         pass
-
-  # Save the common board.
-  common_group.save()
 
   return JsonResponse({
     'id': common_group.id
