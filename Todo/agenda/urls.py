@@ -12,6 +12,7 @@ urlpatterns = [
   path("settings", views.settings_view, name="settings"),
 
   # Settings.
+  path("settings/delete", views.settings_delete_account, name="settings-account-delete"),
   path("settings/alerts", views.settings_update_alerts, name="settings-alerts-update"),
 
   # Alert API.

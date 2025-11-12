@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core import mail
 from django.http import HttpResponse, JsonResponse
@@ -225,6 +225,22 @@ def settings_update_alerts(request):
   settings.save()
 
   return HttpResponse(status=200)
+
+
+@login_required
+def settings_delete_account(request):
+  """Deletes the user's account."""
+
+  # Save the user's account.
+  user = request.user
+
+  # Log the user out.
+  logout(request)
+
+  # Delete the user's account.
+  user.delete()
+
+  return redirect("login")
 
 
 
