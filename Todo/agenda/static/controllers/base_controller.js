@@ -1,3 +1,13 @@
+/* 
+  This file contains code for interactions on most pages.
+
+  Dependencies:
+   - modules/alerts.js
+
+  Contents:
+   - handle_alerts_open(event) -> void:     Handles retreiving the alert information from the server and populating the alert box.
+*/
+
 import { InviteAlertBox, OverdueAlertBox } from "../modules/alerts.js"
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -32,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+// Handles retreiving the alert information from the server and populating the alert box.
 async function handle_alerts_open(event) {
 
   const alert_list = document.getElementById("alert_list");

@@ -1,3 +1,15 @@
+/*
+  This file contains the interaction code for the common board dashboard page.
+
+  Dependencies:
+   - modules/share_box.js
+
+  Contents:
+   - handle_new_common_board_close() -> void:               Clears the contents of the "New Commonboard" dialog.
+   - handle_new_common_board_submission(event) -> void:     Sends the request for a new common board to the server.
+   - create_new_community_board_button(title, id) -> li:    Creates a new common board button for the user to access the common board.
+*/
+
 import * as shared_box from "../modules/share_box.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -18,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* New Common Taskboard event handlers. */
 
 
+// Clears the contents of the "New Commonboard" dialog.
 function handle_new_common_board_close() {
 
     // Clear the title field.
@@ -25,7 +38,7 @@ function handle_new_common_board_close() {
 
 }
 
-
+// Sends the request for a new common board to the server.
 function handle_new_common_board_submission(event) {
 
     // Get the dialog.
@@ -75,6 +88,7 @@ function handle_new_common_board_submission(event) {
 /* Utilities. */
 
 
+// Creates a new common board button for the user to access the common board.
 function create_new_community_board_button(title, id) {
 
     // Create the necessary elements.

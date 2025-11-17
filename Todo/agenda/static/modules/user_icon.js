@@ -1,3 +1,11 @@
+/*
+  This file contains the definition for user icons.
+
+  Contents:
+   - UserIcon:        An circular container to identify users visually.
+*/
+
+// An circular container to identify users visually.
 export class UserIcon {
 
   #username;
@@ -20,8 +28,6 @@ export class UserIcon {
 
     // Set the image source.
     this.#source.src = `https://gravatar.com/avatar/${this.#email_hash}`;
-
-    console.log(this.#email_hash);
 
     // Add styling to the element.
     this.#source.classList.add("user_icon");

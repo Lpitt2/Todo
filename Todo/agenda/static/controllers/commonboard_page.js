@@ -1,3 +1,30 @@
+/*
+  This file contains the interaction code for a common board page.
+
+  Dependencies:
+   - Taskboard (modules/taskboard.js)
+   - Task (modules/task.js)
+   - User Sockets (modules/user_socket.js)
+   - Share Box (modules/share_box.js)
+   - Standard Taskboard Driver Code (modules/taskboard_driver.js)
+   - User Icon (modules/user_icon.js)
+
+  Contents:
+   - render() -> void:                                  Performs the initial setup of the task board.
+   - handle_edit_common_board(data) -> void:            Handles user updating the common board name.
+   - handle_edit_task_taskboard(event) -> void:         Sets up the edit task dialog and displays it.
+   - handle_new_task_submission(event) -> void:         Sends the new task information to the server.
+   - handle_new_group_submission(event) -> void:        Sends the new group information to the server.
+   - handle_new_group_dialog_close(event) -> void:      Clears the contents of the new group dialog.
+   - handle_share_dialog_open(event) -> void:           Populates the contents of the shared dialog.
+   - handle_edit_task_submission(event) -> void:        Sends the updated task information to the server.
+   - handle_share_submission(event) -> void:            Sends invites to the respective users.
+   - handle_leave_common_board_click(event) -> void:    Sends a request to remove a user from the common board.
+   - handle_board_rename(event) -> void:                Sends the new name of the common board to the server.
+   - handle_board_rename_keypress(event) -> void:       Prevents a new line character from appearing in the name.
+   - handle_user_update(event) -> void:                 Handles when a new user is also viewing the common board.
+*/
+
 import { Taskboard } from "../modules/taskboard.js";
 import { build_task_from_json } from "../modules/task.js";
 import { CommonSocket, ISocket } from "../modules/user_socket.js";
@@ -71,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* Common taskboard utilities. */
 
 
+// Performs the initial setup of the task board.
 function render() {
 
   // Declare variables.
@@ -119,6 +147,7 @@ function render() {
   
 }
 
+// Handles user updating the common board name.
 function handle_edit_common_board(data) {
 
   // Get the elements.
@@ -138,6 +167,7 @@ function handle_edit_common_board(data) {
 /* Taskboard events. */
 
 
+// Sets up the edit task dialog and displays it.
 async function handle_edit_task_taskboard(event) {
 
   // Declare variables.
@@ -227,6 +257,7 @@ async function handle_edit_task_taskboard(event) {
 /* Form event handlers. */
 
 
+// Sends the new task information to the server.
 function handle_new_task_submission(event) {
 
   // Get the objects from the form.
@@ -276,6 +307,7 @@ function handle_new_task_submission(event) {
 
 }
 
+// Sends the new group information to the server.
 function handle_new_group_submission(event) {
 
   // Declare variables.
@@ -306,6 +338,7 @@ function handle_new_group_submission(event) {
 
 }
 
+// Clears the contents of the new group dialog.
 function handle_new_group_dialog_close(event) {
 
    // Clear the contents of the fields.
@@ -313,6 +346,7 @@ function handle_new_group_dialog_close(event) {
 
 }
 
+// Populates the contents of the shared dialog.
 function handle_share_dialog_open(event) {
 
   // Get the common board id.
@@ -335,6 +369,7 @@ function handle_share_dialog_open(event) {
 
 }
 
+// Sends the updated task information to the server.
 function handle_edit_task_submission(event) {
 
   // Get form element values.
@@ -380,6 +415,7 @@ function handle_edit_task_submission(event) {
 
 }
 
+// Sends invites to the respective users.
 function handle_share_submission(event) {
 
   // Get the common board id.
@@ -414,6 +450,7 @@ function handle_share_submission(event) {
 /* Common board administration events. */
 
 
+// Sends a request to remove a user from the common board.
 function handle_leave_common_board_click(event) {
 
     // Get the common board id.
@@ -434,6 +471,7 @@ function handle_leave_common_board_click(event) {
 
 }
 
+// Sends the new name of the common board to the server.
 async function handle_board_rename(event) {
 
   // Get the element values.
@@ -470,6 +508,7 @@ async function handle_board_rename(event) {
 
 }
 
+// Prevents a new line character from appearing in the name.
 function handle_board_rename_keypress(event) {
 
   // Prevent the user from entering a new line character.
@@ -481,6 +520,7 @@ function handle_board_rename_keypress(event) {
 
 }
 
+// Handles when a new user is also viewing the common board.
 async function handle_user_update(users) {
 
   // Get the active users list.

@@ -1,3 +1,12 @@
+/*
+  This file contains the utility code for tasks.
+
+  Contents:
+   - Task:                            Represents a task.
+   - build_task_from_json:            Creates a task from a JSON object.
+*/
+
+
 // Represents a task.
 export class Task {
 
@@ -26,6 +35,7 @@ export class Task {
 
 };
 
+// Creates a task from a JSON object.
 export function build_task_from_json(data) {
 
   // Declare task object.

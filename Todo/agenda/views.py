@@ -145,10 +145,30 @@ def home_view(request):
   # Extract the user.
   user = request.user
 
+  # Get the viewing settings.
+  setting = None
+  try:
+
+    setting = ViewSetting.objects.get(user=user)
+
+  except:
+
+    # Create the view settings object.
+    setting = ViewSetting()
+    setting.user = user
+    setting.save()
+
   # Ensure that the user is registered.
   token = registration.register_user(request.user)
 
-  return render(request, "agenda/home.html", {'user_token': token})
+  # Create the response.
+  response = render(request, "agenda/home.html", {'user_token': token})
+
+  # Set the settings variables.
+  response.set_cookie("view-description", setting.display_description)
+  response.set_cookie("view-due-date", setting.display_due_date)
+
+  return response
 
 
 @login_required(login_url="/login")
@@ -157,6 +177,19 @@ def shared_view(request, id):
 
   # Extract the user.
   user = request.user
+
+  # Get the viewing settings.
+  setting = None
+  try:
+
+    setting = ViewSetting.objects.get(user=user)
+
+  except:
+
+    # Create the view settings object.
+    setting = ViewSetting()
+    setting.user = user
+    setting.save()
 
   # Ensure that the user is registered.
   token = registration.register_user(request.user)
@@ -175,7 +208,14 @@ def shared_view(request, id):
   if (not common_group.user_authorized(user)):
     return HttpResponse(status=401)
 
-  return render(request, "agenda/shared_commonboard.html", {'user_token': token, 'user_boards': user_boards, 'common_board': common_group})
+  # Create the response.
+  response = render(request, "agenda/shared_commonboard.html", {'user_token': token, 'user_boards': user_boards, 'common_board': common_group})
+
+  # Add the setting cookies.
+  response.set_cookie("view-description", setting.display_description)
+  response.set_cookie("view-due-date", setting.display_due_date)
+
+  return response
 
 
 @login_required(login_url="/login")

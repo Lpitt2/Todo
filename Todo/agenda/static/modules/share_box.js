@@ -1,7 +1,23 @@
+/*
+  Thie file contains the functionallity of the share dialog.
+
+  Dependencies:
+   - User Icon (modules/user_icon.js)
+
+  Content:
+   - handle_keydown_share_names_field:          Handles adding a user to the share list.
+   - delete_email_block_click:                  Handles removing a user from the share list.
+   - convert_shared_usernames_to_list:          Converts the users within the share list into a list of usernames.
+   - preset_share_list:                         Populate the share list with users already existing.
+   - build_user_block:                          Creates a user icon for the share list.
+*/
+
 import { UserIcon } from "./user_icon.js";
 
 /* Event handlers. */
 
+
+// Handles adding a user to the share list.
 export async function handle_keydown_event_share_names_field(event) {
 
   // Get the list of emails.
@@ -46,6 +62,7 @@ export async function handle_keydown_event_share_names_field(event) {
 }
 
 
+// Handles removing a user from the share list.
 function delete_email_block_click(icon) {
 
   // Get the source.
@@ -63,6 +80,7 @@ function delete_email_block_click(icon) {
 /* Utility functions */
 
 
+// Converts the users within the share list into a list of usernames.
 export function convert_shared_usernames_to_list(shared_elements_list, remove_ignored_users = true) {
 
   // Declare local variables.
@@ -79,6 +97,7 @@ export function convert_shared_usernames_to_list(shared_elements_list, remove_ig
 }
 
 
+// Populate the share list with users already existing.
 export async function preset_share_list(shared_usernames_list, users) {
 
   // Get the email list object.
@@ -100,6 +119,7 @@ export async function preset_share_list(shared_usernames_list, users) {
 }
 
 
+// Creates a user icon for the share list.
 async function build_user_block(username, ignore = false) {
 
   // Declare elements.

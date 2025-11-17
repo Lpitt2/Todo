@@ -1,3 +1,11 @@
+/*
+  This file contains the logical structure for taskboards.
+
+  Content:
+   - Taskboard:             Manages the groups and task blocks.
+   - style_task_block:      Applys conditional styling to a task block given the completion status and due-date.
+*/
+
 // Manages the groups and task blocks.
 export class Taskboard {
 
@@ -96,20 +104,44 @@ export class Taskboard {
 
   }
 
-  #build_task_box(task) {
+  async #build_task_box(task) {
 
     // Declare elements.
     const task_box = document.createElement("li");
+    const header_box = document.createElement("div");
     const completion_box = document.createElement("input");
     const task_title = document.createElement("span");
     const delete_container = document.createElement("div");
     const delete_icon = document.createElement("img");
 
+    // Get the settings values.
+    const view_description = (await cookieStore.get({name: "view-description"})).value;
+    const view_due_date = (await cookieStore.get({name: "view-due-date"})).value;
+
     // Build the structure of the task block.
     delete_container.append(delete_icon);
-    task_box.append(completion_box);
-    task_box.append(task_title);
-    task_box.append(delete_container);
+    header_box.append(completion_box);
+    header_box.append(task_title);
+    header_box.append(delete_container);
+    task_box.append(header_box);
+
+    // Build the description block if necessary.
+    if (view_description === 'True') {
+
+      const description_block = this.#build_description(task);
+
+      task_box.append(description_block);
+
+    }
+
+    // Build the due-date block if necessary.
+    if (view_due_date === 'True' && task.due_date != null) {
+
+      const due_date_block = this.#build_due_date(task);
+
+      task_box.append(due_date_block);
+
+    }
 
     // Set up the delete icon information.
     delete_icon.src = "/static/icons/delete.svg";
@@ -139,22 +171,46 @@ export class Taskboard {
 
   }
 
+  #build_description(task) {
+
+    // Create objects.
+    const description_block = document.createElement("div");
+
+    // Set the description text.
+    description_block.innerText = task.description;
+
+    return description_block;
+
+  }
+
+  #build_due_date(task) {
+
+    // Create objects.
+    const due_date_block = document.createElement("div");
+
+    // Set the text.
+    due_date_block.innerText = `Due-Date:  ${task.due_date.getMonth()}/${task.due_date.getDate()}/${task.due_date.getFullYear()}`;
+
+    return due_date_block;
+
+  }
+
   /* Task methods. */
 
-  add_task(task) {
+  async add_task(task) {
 
     // Find the group for the task.
     const group_box = this.#taskboard.querySelector(`[data-group="${task.group}"]`).querySelector("ul");
 
     // Build the task box.
-    const task_box = this.#build_task_box(task);
+    const task_box = await this.#build_task_box(task);
 
     // Append the task box to the group box.
     group_box.append(task_box);
 
   }
 
-  update_task(task) {
+  async update_task(task) {
 
     // Get the task object.
     const task_box = this.#taskboard.querySelector(`[data-task="${task.id}"]`);
@@ -166,7 +222,7 @@ export class Taskboard {
       task_box.remove();
 
       // Add the task to the proper group.
-      this.add_task(task);
+      await this.add_task(task);
 
     } else {
 
@@ -229,8 +285,6 @@ export class Taskboard {
   }
 
 };
-
-
 
 // Applys conditional styling to a task block given the completion status and due-date.
 export function style_task_block(task_block, task) {

@@ -1,3 +1,19 @@
+/*
+  This file contains the interaction code for the home page.
+
+  Dependencies:
+   - Taskboard (modules/taskboard.js)
+   - User Socket (modules/user_socket.js)
+   - Standard Taskboard Driver Code (modules/taskboard_driver.js)
+
+  Contents:
+   - render() -> void:                                  Performs the initial setup of the task board.
+   - handle_new_task_submission(event) -> void:         Sends the new task information to the server.
+   - handle_new_group_submission(event) -> void:        Sends the new group information to the server.
+   - handle_new_group_dialog_close(event) -> void:      Clears the contents of the new group dialog.
+   - handle_edit_task_submission(event) -> void:        Sends the updated task information to the server.
+*/
+
 import { Taskboard } from "../modules/taskboard.js";
 import { build_task_from_json } from "../modules/task.js";
 import { UserSocket } from "../modules/user_socket.js";
@@ -52,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* Personal taskboard utilities. */
 
 
+// Performs the initial setup of the task board.
 function render() {
 
   // Retrieve the task and group information from the server.
@@ -95,6 +112,7 @@ function render() {
 
 /* Form Event Handlers. */
 
+// Sends the new task information to the server.
 function handle_new_task_submission(event) {
 
   // Get the objects from the form.
@@ -144,6 +162,7 @@ function handle_new_task_submission(event) {
 
 }
 
+// Sends the new group information to the server.
 function handle_new_group_submission(event) {
 
   // Declare variables.
@@ -172,6 +191,7 @@ function handle_new_group_submission(event) {
 
 }
 
+// Clears the contents of the new group dialog.
 function handle_new_group_dialog_close(event) {
 
    // Clear the contents of the fields.
@@ -179,6 +199,7 @@ function handle_new_group_dialog_close(event) {
 
 }
 
+// Sends the updated task information to the server.
 function handle_edit_task_submission(event) {
 
   // Get form element values.

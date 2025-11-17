@@ -1,13 +1,18 @@
+/*
+  This file contains the interaction code for the settings page.
+
+  Content:
+   - handle_account_delete:         Sends the delete request to the server.
+   - handle_alert_option_change:    Sends the updated information for allowing/silencing alerts.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
 
   // Get the elements.
   const delete_button = document.getElementById("delete-account-button");
-  const view_selector = document.getElementById("view-selector");
-  const alert_form = document.getElementById("alert-form");
 
   // Set the event handlers for the elements.
   delete_button.addEventListener("click", handle_account_delete);
-  view_selector.addEventListener("change", handle_view_selector_change);
   document.querySelectorAll(".common-board-alert-setting-options").forEach(option => {
     option.addEventListener("click", handle_alert_option_change);
   });
@@ -17,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
+// Sends the delete request to the server.
 async function handle_account_delete() {
 
   // Prompt the user to confirm.
@@ -33,10 +38,7 @@ async function handle_account_delete() {
 
 }
 
-function handle_view_selector_change() {
-
-}
-
+// Sends the updated information for allowing/silencing alerts.
 function handle_alert_option_change(event) {
  
   // Get the selected option.

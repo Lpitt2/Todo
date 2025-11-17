@@ -1,3 +1,28 @@
+/*
+  This file contains the reusable driver code for task boards.
+
+  Dependencies:
+   - ISocket (./user_sockets.js)
+   - Task (./task.js)
+
+  Content:
+   - set_taskboard:                       Sets the global taskboard.
+   - set_connection:                      Sets the global socket connection.
+   - handle_new_task_taskboard:           Displays the new task dialog.
+   - handle_edit_task_taskboard:          Displays the task edit dialog.
+   - handle_delete_task_taskboard:        Sends the delete request to the server.
+   - handle_complete_task_taskboard:      Sends the completion request to the server.
+   - handle_group_rename_taskboard:       Sends the updated group name to the server.
+   - handle_group_delete_taskboard:       Sends the group deletion request to the server.
+   - handle_new_task_socket:              Adds a new task block to the taskboard.
+   - handle_edit_task_socket:             Updates an existing taskblock on the taskboard.
+   - handle_delete_task_socket:           Removes an existing taskblock on the taskboard.
+   - handle_new_group_socket:             Adds a new group block on the taskboard.
+   - handle_edit_group_socket:            Updates an existing group block on the taskboard.
+   - handle_delete_group_socket:          Removes an existing group block on the taskboard.
+   - handle_error_socket:                 Displays an error message to the user.
+*/
+
 import { ISocket } from "./user_socket.js";
 import { Task } from "./task.js";
 
@@ -8,10 +33,12 @@ import { Task } from "./task.js";
 let _taskboard = null;
 let _connection = null;
 
+// Sets the global taskboard.
 export function set_taskboard(taskboard) {
   _taskboard = taskboard;
 }
 
+// Sets the global socket connection.
 export function set_connection(connection) {
   _connection = connection;
 }
@@ -23,6 +50,7 @@ export function set_connection(connection) {
 /* Default functionallity for taskboard. */
 
 
+// Displays the new task dialog.
 export function handle_new_task_taskboard(event) { 
 
   // Declare variables.
@@ -46,6 +74,7 @@ export function handle_new_task_taskboard(event) {
 
 }
 
+// Displays the task edit dialog.
 export async function handle_edit_task_taskboard(event) {
 
   // Declare variables.
@@ -127,11 +156,12 @@ export async function handle_edit_task_taskboard(event) {
 
 }
 
+// Sends the delete request to the server.
 export function handle_delete_task_taskboard(event) {
 
   // Declare local variables.
-  const task_title = event.currentTarget.parentElement.parentElement.querySelector("span").innerHTML;
-  const task_id = event.currentTarget.parentElement.parentElement.dataset['task'];
+  const task_title = event.currentTarget.parentElement.parentElement.parentElement.querySelector("span").innerHTML;
+  const task_id = event.currentTarget.parentElement.parentElement.parentElement.dataset['task'];
 
   // Prompt the user for confirmation.
   const response = window.confirm(`Delete ${task_title}`);
@@ -155,10 +185,11 @@ export function handle_delete_task_taskboard(event) {
 
 }
 
+// Sends the completion request to the server.
 export function handle_complete_task_taskboard(event) {
 
   // Declare local variables.
-  const task_id = event.currentTarget.parentElement.dataset['task'];
+  const task_id = event.currentTarget.parentElement.parentElement.dataset['task'];
   const complete = event.currentTarget.checked;
 
   // Send the update information to the server.
@@ -180,6 +211,7 @@ export function handle_complete_task_taskboard(event) {
 
 }
 
+// Sends the updated group name to the server.
 export function handle_group_rename_taskboard(event) {
 
   // Declare local variables.
@@ -202,6 +234,7 @@ export function handle_group_rename_taskboard(event) {
 
 }
 
+// Sends the group deletion request to the server.
 export function handle_group_delete_taskboard(event) {
 
   // Declare local variables.
@@ -230,8 +263,10 @@ export function handle_group_delete_taskboard(event) {
 
 
 
-  /* Default socket event handlers. */
+/* Default socket event handlers. */
 
+
+// Adds a new task block to the taskboard.
 export function handle_new_task_socket(task) {
 
   // Add the task to the taskboard.
@@ -239,6 +274,7 @@ export function handle_new_task_socket(task) {
 
 }
 
+// Updates an existing taskblock on the taskboard.
 export function handle_edit_task_socket(task) {
 
   // Update the task in the taskboard.
@@ -246,6 +282,7 @@ export function handle_edit_task_socket(task) {
 
 }
 
+// Removes an existing taskblock on the taskboard.
 export function handle_delete_task_socket(task_id) {
 
   // Declare local variables.
@@ -256,6 +293,7 @@ export function handle_delete_task_socket(task_id) {
 
 }
 
+// Adds a new group block on the taskboard.
 export function handle_new_group_socket(group_id, group_title) {
 
   // Add the group to the taskboard.
@@ -263,6 +301,7 @@ export function handle_new_group_socket(group_id, group_title) {
 
 }
 
+// Updates an existing group block on the taskboard.
 export function handle_edit_group_socket(group_id, group_title) {
 
   // Update the group information.
@@ -270,6 +309,7 @@ export function handle_edit_group_socket(group_id, group_title) {
 
 }
 
+// Removes an existing group block on the taskboard.
 export function handle_delete_group_socket(group_id) {
 
   // Remove the group from the taskboard.
@@ -277,6 +317,7 @@ export function handle_delete_group_socket(group_id) {
 
 }
 
+// Displays an error message to the user.
 export function handle_error_socket(status, message) {
 
   alert(`${status} - ${message}`);

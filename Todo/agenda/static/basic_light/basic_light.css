@@ -15,7 +15,6 @@
 
 /* Styling for compound elements. */
 @import "./compound/button_groups.css";
-@import "./compound/tab_panel.css";
 
 @import "./alignment.css";
 

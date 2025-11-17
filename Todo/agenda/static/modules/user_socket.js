@@ -1,5 +1,18 @@
+/*
+  This file contains the definitions for web socket connections.
+
+  Dependencies:
+   - build_task_from_json (./task.js)
+
+  Content:
+   - ISocket:           Manages the basis for web sockets connecting to the server.
+   - UserSocket:        Manages sockets for user content.
+   - CommonSocket:      Manages sockets for common board content.
+*/
+
 import { build_task_from_json } from "./task.js";
 
+// Manages the basis for web sockets connecting to the server.
 export class ISocket extends WebSocket {
 
   // Activity constants.
@@ -168,6 +181,7 @@ export class ISocket extends WebSocket {
 
 };
 
+// Manages sockets for user content.
 export class UserSocket extends ISocket {
 
   constructor(url, user_token) {
@@ -197,6 +211,7 @@ export class UserSocket extends ISocket {
 
 };
 
+// Manages sockets for common board content.
 export class CommonSocket extends ISocket {
 
   // Additional constant that is only used for common socket.

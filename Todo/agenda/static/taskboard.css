@@ -32,12 +32,6 @@
 
 .task-list > li {
 
-  display: flex;
-  flex-direction: row;
-
-  justify-content: center;
-  justify-items: center;
-
   margin: 4pt;
   padding: 10pt;
 
@@ -45,6 +39,16 @@
 
   word-wrap: normal;
   border-radius: 4pt;
+
+}
+
+.task-list > li > div {
+
+  display: flex;
+  flex-direction: row;
+  
+  justify-content: center;
+  justify-items: center;
 
 }
 

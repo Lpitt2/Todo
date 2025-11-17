@@ -1,5 +1,13 @@
-/*  */
+/*
+  This file contains the AlertBox class implementations.
 
+  Contents:
+   - AlertBox:            Genaric base class representing an alert box appearing in the alert container.
+   - InviteAlertBox:      Variation of AlertBox intendend to invites.
+   - OverdueAlertBox:     Variation of AlertBox intended to display overdue tasks.
+*/
+
+// Genaric base class representing an alert box appearing in the alert container.
 class AlertBox {
 
   #id;
@@ -72,6 +80,8 @@ class AlertBox {
 
 };
 
+
+// Variation of AlertBox intendend to invites.
 export class InviteAlertBox extends AlertBox {
 
   constructor(id, title) { super(id, title, `You have been invited to ${title} group.`, "INVITE"); }
@@ -146,6 +156,7 @@ export class InviteAlertBox extends AlertBox {
 };
 
 
+// Variation of AlertBox intended to display overdue tasks.
 export class OverdueAlertBox extends AlertBox {
 
   constructor(id, title, description) { super(id, title, description, "OVERDUE"); }
