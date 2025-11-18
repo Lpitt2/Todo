@@ -240,6 +240,22 @@ def settings_view(request):
 
 # Settings.
 
+@login_required
+def settings_delete_account(request):
+  """Deletes the user's account."""
+
+  # Save the user's account.
+  user = request.user
+
+  # Log the user out.
+  logout(request)
+
+  # Delete the user's account.
+  user.delete()
+
+  return redirect("login")
+
+
 @login_required(login_url="/login")
 @require_http_methods(["PUT"])
 @csrf_exempt
@@ -265,22 +281,6 @@ def settings_update_alerts(request):
   settings.save()
 
   return HttpResponse(status=200)
-
-
-@login_required
-def settings_delete_account(request):
-  """Deletes the user's account."""
-
-  # Save the user's account.
-  user = request.user
-
-  # Log the user out.
-  logout(request)
-
-  # Delete the user's account.
-  user.delete()
-
-  return redirect("login")
 
 
 
@@ -363,7 +363,7 @@ def alert_dismiss(request):
   data = JSONDecoder().decode(request.body.decode("utf-8"))
 
   # Ensure that the relavent fields are present in the request.
-  if ('type' not in data or 'id' not in data):
+  if ('id' not in data):
     return HttpResponse(status=400)
 
   alert = None
@@ -373,9 +373,6 @@ def alert_dismiss(request):
     
     # Attempt to find the invite.
     alert = get_object_or_404(Invite, id=data['id'])
-
-  elif (data['type'] == "TASK"):
-    pass
 
   # Delete the alert.
   if (alert != None):

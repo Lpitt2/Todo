@@ -118,34 +118,54 @@ The REST API is summerized below:
     <td>Returns a list of all of the group IDs of the user.</td>
   </tr>
   <tr>
-    <td><code>/project/&lt;ID&gt;/task/new</code></td>
+    <td><code>/user/icon</code></td>
     <td>PUT</td>
-    <td>Creates a new task for the specified project ID.</td>
+    <td>Returns the icon for a specified user information for Gravitar.</td>
   </tr>
   <tr>
-    <td><code>/project/&lt;ID&gt;/task/edit/&lt;task-ID&gt;</code></td>
-    <td>PUT</td>
-    <td>Updates task information for the specified project ID.</td>
-  </tr>
-  <tr>
-    <td><code>/project/&lt;ID&gt;/task/delete/&lt;task-ID&gt;</code></td>
+    <td><code>/shared/info/&lt;ID&gt;</code></td>
     <td>GET</td>
-    <td>Deletes a task within the specified project ID.</td>
+    <td>Returns the title, id, groups, and owners of a common group.</td>
   </tr>
   <tr>
-    <td><code>/project/&lt;ID&gt;/group/new</code></td>
+    <td><code>/shared/edit/&lt;ID&gt;</code></td>
     <td>PUT</td>
-    <td>Creates a new group within the specified project ID.</td>
+    <td>Updates information within a common group.</td>
   </tr>
   <tr>
-    <td><code>/project/&lt;ID&gt;/group/edit/&lt;group-ID&gt;</code></td>
+    <td><code>/shared/new</code></td>
     <td>PUT</td>
-    <td>Updates group information for the specified project ID.</td>
+    <td>Creates a new common group.</td>
   </tr>
   <tr>
-    <td><code>/project/&lt;ID&gt;/group/delete/&lt;group-ID&gt;</code></td>
+    <td><code>/alerts/tasks</code></td>
     <td>GET</td>
-    <td>Deletes a group within the specified project ID.</td>
+    <td>Returns all overdue tasks for a user.</td>
+  </tr>
+  <tr>
+    <td><code>/alerts/invites</code></td>
+    <td>GET</td>
+    <td>Returns the invites that a user has recieved.</td>
+  </tr>
+  <tr>
+    <td><code>/alerts/invite/dismiss</code></td>
+    <td>PUT</td>
+    <td>Dismisses an invite.</td>
+  </tr>
+  <tr>
+    <td><code>/alerts/invite/accept</code></td>
+    <td>PUT</td>
+    <td>Accepts an invite.</td>
+  </tr>
+  <tr>
+    <td><code>/settings/delete</code></td>
+    <td>GET</td>
+    <td>Deletes the requesting user's account.</td>
+  </tr>
+  <tr>
+    <td><code>/settings/alerts</code></td>
+    <td>PUT</td>
+    <td>Changes the visibility of common groups alert status.</td>
   </tr>
 </table>
 
@@ -552,6 +572,185 @@ __Output__:
   </tr>
 </table>
 
+### Update Alert Preferences (/settings/alerts)
+
+This API endpoint updates the alert preferences. When the user chooses to silence or allow alerts from common
+groups, then a JSON object is sent to this endpoint with the updated information.
+
+__Input__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>id</code></td>
+    <td>True</td>
+    <td>Int</td>
+    <td>The ID of the common group whose setting is being changed.</td>
+  </tr>
+  <tr>
+    <td><code>status</code></td>
+    <td>True</td>
+    <td>Boolean</td>
+    <td>Determines if the common group can send alerts to the user.</td>
+  </tr>
+</table>
+
+### Alert Info for Tasks (/alerts/tasks)
+
+This API endpoint returns all tasks that are overdue for the requesting user. It will obmit any tasks that 
+from a common group that is silenced.
+
+__Output__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>tasks</code></td>
+    <td>Array</td>
+    <td>Contains sub-JSON objects pretaining to task information including id, title, and description.</td>
+  </tr>
+</table>
+
+### Alert Info for Invites (/alerts/invites)
+
+This API endpoint returns all invitations to common groups for a user.
+
+__Output__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>invites</code></td>
+    <td>Array</td>
+    <td>Contains sub-JSON objects pretaining to invitation information including it and title.</td>
+  </tr>
+</table>
+
+### Dismiss Invitiation (/alert/invite/dismiss)
+
+This API endpoint will dismiss an invitation for a user.
+
+__Input__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>id</code></td>
+    <td>True</td>
+    <td>Int</td>
+    <td>The id of the common group.</td>
+  </tr>
+</table>
+
+### Accept Invitation (/alert/invite/accept)
+
+This API endpoint will add a user to a common group that they have been invited to join.
+
+__Input__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>id</code></td>
+    <td>True</td>
+    <td>Int</td>
+    <td>The id of the common group that the user is joining.</td>
+  </tr>
+</table>
+
+### User Group Info (/user/groups)
+
+This API endpoint returns information about the groups that the requesting user has in 
+their personal taskboard.
+
+__Output__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>groups</code></td>
+    <td>Array</td>
+    <td>Contains sub-JSON objects pretaining to groups within the user's personal taskboard.</td>
+  </tr>
+</table>
+
+### User Task Info (/user/tasks)
+
+This API endpoint returns information about the tasks that the requesting user has in
+their personal taskboard.
+
+__Output__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>tasks</code></td>
+    <td>Array</td>
+    <td>Contains sub-JSON objects pertaining to tasks within the user's personal taskboard.</td>
+  </tr>
+</table>
+
+### User Icon (/user/icon)
+
+This API endpoint returns the hashed email address of the user requested. This is used 
+for getting the user's icon from Gravitar.
+
+__Input__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>username</code></td>
+    <td>True</td>
+    <td>String</td>
+    <td>The username of the user whose icon is being requested.</td>
+  </tr>
+</table>
+
+__Output__:
+<table>
+  <tr>
+    <th>Field</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>hash</code></td>
+    <td>String</td>
+    <td>The email hash of the user's email.</td>
+  </tr>
+</table>
+
+For more information about how Gravitar accounts/icons work and the email hash visit https://docs.gravatar.com/.
+
 ### All Delete Endpoints.
 
 This encompasses delete task (/task/delete/&lt;id&gt;) and delete group (/group/delete/&lt;id&gt;). These 
@@ -576,25 +775,8 @@ The client side code is written in traditional JavaScript using elements that ar
 are not depreciated. Generally, this code should work on any modern HTML5 complient browser, but is
 tested on Firefox and Brave. The client side code mainly uses JavaScript modules to provide a modern
 and clean organizational structure. The term _Controller_ is used to denote that those JavaScript files
-exist to provide driver code for specific web pages. A driver only contains code that will be used 
-exclusively on one web page. The table below associated the driver files with their web pages.
-
-<table>
-  <tr>
-    <th>Driver Name</th>
-    <th>URL</th>
-  </tr>
-  <tr>
-    <td>dashboard.js</td>
-    <td><code>/home</code></td>
-  </tr>
-  <tr>
-    <td>shareboard.js</td>
-    <td>
-      <code>/shared</code>    
-    </td>
-  </tr>
-</table>
+exist to provide driver code for specific web pages. Controllers exist within the '/agenda/static/controllers/'
+folder.
 
 The modules include taskboard, user_socket, and task. The _task_ module contains utilities for representing,
 and extracting, tasks within the client code. The _taskboard_ module contains the taskboard class which 
