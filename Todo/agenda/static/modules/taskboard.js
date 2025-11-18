@@ -271,7 +271,7 @@ class TaskBlock {
     // Get the completion status.
     const complete = event.currentTarget.checked;
 
-    // this.#on_complete_click(this, complete);
+    this.#on_complete_click(this, complete);
 
     // Prevent the edit dialog from displaying.
     event.stopPropagation();
@@ -381,6 +381,9 @@ class TaskBlock {
       this.#due_date.innerText = `Due-Date: ${updated_task.due_date.getMonth()}/${updated_task.due_date.getDate()}/${updated_task.due_date.getFullYear()}`;
 
     }
+
+    // Update the styling.
+    style_task_block(this.#source, updated_task);
 
     // Update the stored task object.
     this.#task = updated_task;

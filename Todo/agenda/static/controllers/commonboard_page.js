@@ -168,10 +168,10 @@ function handle_edit_common_board(data) {
 
 
 // Sets up the edit task dialog and displays it.
-async function handle_edit_task_taskboard(event) {
+async function handle_edit_task_taskboard(task_board) {
 
   // Declare variables.
-  const id = event.currentTarget.dataset['task'];
+  const id = task_board.task.id;
   const common_id = document.getElementById("common_id").value;
 
   // Get the elements.
