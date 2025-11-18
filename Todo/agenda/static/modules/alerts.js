@@ -92,10 +92,9 @@ export class InviteAlertBox extends AlertBox {
     super.dismiss();
 
     // Make request to server to dismiss the alert.
-    await fetch(`http://localhost:8000/alerts/dismiss`, {
+    await fetch(`http://localhost:8000/alerts/invite/dismiss`, {
         method: "PUT",
         body: JSON.stringify({
-          'type': this.type,
           'id': this.id
         })
       }

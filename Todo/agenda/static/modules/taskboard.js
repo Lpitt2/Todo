@@ -6,17 +6,22 @@
    - style_task_block:      Applys conditional styling to a task block given the completion status and due-date.
 */
 
+const _view_description = await cookieStore.get({name: "view-description"}).value;
+const _view_due_date = await cookieStore.get({name: "view-due-date"}).value;
+
 // Manages the groups and task blocks.
 export class Taskboard {
 
   #taskboard = null;
 
   #on_task_new = () => {};
-  #on_task_edit = () => {};
-  #on_task_complete = () => {};
-  #on_task_delete = () => {};
+  #on_task_edit = (task_block) => {};
+  #on_task_complete = (task_block) => {};
+  #on_task_delete = (task_block) => {};
   #on_group_rename = () => {};
   #on_group_delete = () => {};
+
+  #task_blocks = [];
 
   constructor(taskboard) { this.#taskboard = taskboard; }
 
@@ -93,10 +98,17 @@ export class Taskboard {
     tasks.forEach(task => {
 
       // Create the task block.
-      const task_box = this.#build_task_box(task);
+      const task_block = new TaskBlock(task);
+
+      task_block.on_edit_click = this.#on_task_edit;
+      task_block.on_complete_click = this.#on_task_complete;
+      task_block.on_delete_click = this.#on_task_delete;
+
+      // Add the task block to the group block.
+      task_list.append(task_block.build());
 
       // Append the task box to the list.
-      task_list.append(task_box);
+      task_list.push(task_box);
 
     });
 
@@ -104,145 +116,82 @@ export class Taskboard {
 
   }
 
-  async #build_task_box(task) {
-
-    // Declare elements.
-    const task_box = document.createElement("li");
-    const header_box = document.createElement("div");
-    const completion_box = document.createElement("input");
-    const task_title = document.createElement("span");
-    const delete_container = document.createElement("div");
-    const delete_icon = document.createElement("img");
-
-    // Get the settings values.
-    const view_description = (await cookieStore.get({name: "view-description"})).value;
-    const view_due_date = (await cookieStore.get({name: "view-due-date"})).value;
-
-    // Build the structure of the task block.
-    delete_container.append(delete_icon);
-    header_box.append(completion_box);
-    header_box.append(task_title);
-    header_box.append(delete_container);
-    task_box.append(header_box);
-
-    // Build the description block if necessary.
-    if (view_description === 'True') {
-
-      const description_block = this.#build_description(task);
-
-      task_box.append(description_block);
-
-    }
-
-    // Build the due-date block if necessary.
-    if (view_due_date === 'True' && task.due_date != null) {
-
-      const due_date_block = this.#build_due_date(task);
-
-      task_box.append(due_date_block);
-
-    }
-
-    // Set up the delete icon information.
-    delete_icon.src = "/static/icons/delete.svg";
-    delete_icon.width = 10;
-    delete_icon.height = 10;
-
-    // Add the event handlers.
-    completion_box.addEventListener("click", this.#on_task_complete);
-    task_box.addEventListener("click", this.#on_task_edit);
-    delete_icon.addEventListener("click", this.#on_task_delete);
-
-    // Apply CSS styling.
-    delete_container.className = "hover-icon";
-    style_task_block(task_box, task);
-
-    // Set up the completition checkbox.
-    completion_box.type = "checkbox";
-
-    // Set the title of the task block.
-    task_title.textContent = task.title;
-
-    // Set the task ID.
-    task_box.dataset['task'] = task.id;
-    task_box.id = `task-${task.id}`;
-
-    return task_box;
-
-  }
-
-  #build_description(task) {
-
-    // Create objects.
-    const description_block = document.createElement("div");
-
-    // Set the description text.
-    description_block.innerText = task.description;
-
-    return description_block;
-
-  }
-
-  #build_due_date(task) {
-
-    // Create objects.
-    const due_date_block = document.createElement("div");
-
-    // Set the text.
-    due_date_block.innerText = `Due-Date:  ${task.due_date.getMonth()}/${task.due_date.getDate()}/${task.due_date.getFullYear()}`;
-
-    return due_date_block;
-
-  }
-
   /* Task methods. */
 
-  async add_task(task) {
+  add_task(task) {
 
     // Find the group for the task.
     const group_box = this.#taskboard.querySelector(`[data-group="${task.group}"]`).querySelector("ul");
 
-    // Build the task box.
-    const task_box = await this.#build_task_box(task);
+    // Create a new task Object.
+    const task_block = new TaskBlock(task);
+
+    // Set the event handlers.
+    task_block.on_edit_click = this.#on_task_edit;
+    task_block.on_complete_click = this.#on_task_complete;
+    task_block.on_delete_click = this.#on_task_delete;
 
     // Append the task box to the group box.
-    group_box.append(task_box);
+    group_box.append(task_block.build());
+
+    // Append the task block to the array.
+    this.#task_blocks.push(task_block);
 
   }
 
-  async update_task(task) {
+  update_task(task) {
 
-    // Get the task object.
-    const task_box = this.#taskboard.querySelector(`[data-task="${task.id}"]`);
+    // Find the appropriate task block object.
+    this.#task_blocks.forEach(block => {
 
-    // Determine if the group has changed.
-    if (task_box.parentElement.parentElement.dataset['group'] != task.group) {
+      // Determine if the current block has the same id.
+      if (block.task.id === task.id) {
 
-      // Remove the task from the current group.
-      task_box.remove();
+        // Update the task group if necessary.
+        if (block.task.group !== task.group) {
 
-      // Add the task to the proper group.
-      await this.add_task(task);
+          // Remove the task block from its current group box.
+          block.source.remove();
 
-    } else {
+          // Find the group box.
+          const group_box = this.#taskboard.querySelector(`[data-group="${task.group}"]`).querySelector("ul");
 
-      // Update the title to the new task.
-      task_box.querySelector("span").innerHTML = task.title;
+          // Set the updated task information to the task block.
+          block.task = task;
 
-      // Update the completion status.
-      style_task_block(task_box, task);
+          // Add the block to the new group box.
+          group_box.append(block.build());
 
-    }
+        } else {
+
+          // Update the task block.
+          block.update(task);
+
+        }
+
+      }
+
+    });
 
   }
 
   delete_task(task) {
 
-    // Get the task box.
-    const task_box = this.#taskboard.querySelector(`[data-task="${task.id}"]`);
+    // Find the task block.
+    this.#task_blocks.forEach(block => {
 
-    // Remove the task box from the taskboard.
-    task_box.remove();
+      // Determine if the current task is the one to be deleted.
+      if (task.id === block.task.id) {
+
+        // Remove the task box from the taskboard.
+        block.source.remove();
+
+        // Remove the task block from the list.
+        this.#task_blocks.splice(this.#task_blocks.indexOf(block), 1);
+
+      }
+
+    });
 
   }
 
@@ -285,6 +234,163 @@ export class Taskboard {
   }
 
 };
+
+
+
+class TaskBlock {
+
+  #task;
+
+  // Event handlers.
+
+  #on_complete_click = (task_block, complete) => {};
+  #on_edit_click = async (task_block) => {};
+  #on_delete_click = (task_block) => {};
+
+  // UI elements.
+
+  #source;
+  #task_title;
+  #description = null;
+  #due_date = null;
+  
+
+  constructor(task) { this.#task = task; }
+
+  get task() { return this.#task; }
+  get source() { return this.#source; }
+
+  set task(task) { this.#task = task; }
+  set on_complete_click(on_complete_click) { this.#on_complete_click = on_complete_click; }
+  set on_edit_click(on_edit_click) { this.#on_edit_click = on_edit_click; }
+  set on_delete_click(on_delete_click) { this.#on_delete_click = on_delete_click; }
+
+
+  handle_complete_click(event) {
+
+    // Get the completion status.
+    const complete = event.currentTarget.checked;
+
+    // this.#on_complete_click(this, complete);
+
+    // Prevent the edit dialog from displaying.
+    event.stopPropagation();
+
+  }
+
+  handle_delete_click(event) {
+
+    this.#on_delete_click(this);
+
+    // Prevent the edit dialog from displaying.
+    event.stopPropagation();
+
+  }
+
+  async handle_edit_click(event) {
+
+    await this.#on_edit_click(this);
+
+  }
+
+
+  build() {
+
+    // Create the objects.
+    this.#source = document.createElement("li");
+    const header_box = document.createElement("div");
+    const completion_box = document.createElement("input");
+    this.#task_title = document.createElement("span");
+    const delete_container = document.createElement("div");
+    const delete_icon = document.createElement("img");
+
+    // Build the structure of the task block.
+    delete_container.append(delete_icon);
+    header_box.append(completion_box);
+    header_box.append(this.#task_title);
+    header_box.append(delete_container);
+    this.#source.append(header_box);
+
+    // Create the description if necessary.
+    if (_view_description === "true") {
+
+      // Create the description block.
+      this.#description = document.createElement("div");
+
+      // Set the content of the description block.
+      this.#description.textContent = this.#task.description;
+
+      // Append the description block to the task block.
+      this.#source.append(this.#description);
+
+    }
+
+    // Create the due date if necessary.
+    if (_view_due_date === "true") {
+
+      // Create the due date block.
+      this.#due_date = document.createElement("div");
+
+      // Set the content of the due date block.
+      this.#due_date = `Due-Date: ${this.#task.getMonth()}/${this.#task.getDate()}/${this.#task.due_date.getFullYear()}`;
+
+      // Append the due date block to the task block.
+      this.#source.append(this.#due_date);
+
+    }
+ 
+    // Set up the delete icon information.
+    delete_icon.src = "/static/icons/delete.svg";
+    delete_icon.width = 10;
+    delete_icon.height = 10;
+
+    // Add the event handlers.
+    completion_box.addEventListener("click", this.handle_complete_click.bind(this));
+    this.#source.addEventListener("click", this.handle_edit_click.bind(this));
+    delete_icon.addEventListener("click", this.handle_delete_click.bind(this));
+
+    // Apply CSS styling.
+    delete_container.className = "hover-icon";
+    style_task_block(this.#source, this.#task);
+
+    // Set up the completition checkbox.
+    completion_box.type = "checkbox";
+
+    // Set the title of the task block.
+    this.#task_title.textContent = this.#task.title;
+
+    return this.#source;
+
+  }
+
+  update(updated_task) {
+
+    // Update the title.
+    this.#task_title.textContent = updated_task.title;
+
+    // Update the description if necessary.
+    if (this.#description !== null) {
+
+      this.#description.innerText = updated_task.description;
+
+    }
+
+    // Update the due date if necessary.
+    if (this.#due_date !== null) {
+
+      this.#due_date.innerText = `Due-Date: ${updated_task.due_date.getMonth()}/${updated_task.due_date.getDate()}/${updated_task.due_date.getFullYear()}`;
+
+    }
+
+    // Update the stored task object.
+    this.#task = updated_task;
+
+  }
+
+};
+
+
+
 
 // Applys conditional styling to a task block given the completion status and due-date.
 export function style_task_block(task_block, task) {

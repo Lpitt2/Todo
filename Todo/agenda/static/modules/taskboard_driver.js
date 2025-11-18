@@ -75,10 +75,10 @@ export function handle_new_task_taskboard(event) {
 }
 
 // Displays the task edit dialog.
-export async function handle_edit_task_taskboard(event) {
+export async function handle_edit_task_taskboard(task_block) {
 
   // Declare variables.
-  const id = event.currentTarget.dataset['task'];
+  const id = task_block.task.id;
 
   // Get the elements.
   const dialog = document.getElementById("edit-task-dialog");
@@ -157,11 +157,11 @@ export async function handle_edit_task_taskboard(event) {
 }
 
 // Sends the delete request to the server.
-export function handle_delete_task_taskboard(event) {
+export function handle_delete_task_taskboard(task_block) {
 
   // Declare local variables.
-  const task_title = event.currentTarget.parentElement.parentElement.parentElement.querySelector("span").innerHTML;
-  const task_id = event.currentTarget.parentElement.parentElement.parentElement.dataset['task'];
+  const task_title = task_block.task.title;
+  const task_id = task_block.task.id;
 
   // Prompt the user for confirmation.
   const response = window.confirm(`Delete ${task_title}`);
@@ -180,17 +180,13 @@ export function handle_delete_task_taskboard(event) {
 
   }
 
-  // Prevent the edit dialog from displaying.
-  event.stopPropagation();
-
 }
 
 // Sends the completion request to the server.
-export function handle_complete_task_taskboard(event) {
+export function handle_complete_task_taskboard(task_block, complete) {
 
   // Declare local variables.
-  const task_id = event.currentTarget.parentElement.parentElement.dataset['task'];
-  const complete = event.currentTarget.checked;
+  const task_id = task_block.task.id;
 
   // Send the update information to the server.
   fetch(`http://localhost:8000/task/edit/${task_id}`, {
@@ -205,9 +201,6 @@ export function handle_complete_task_taskboard(event) {
     _connection.request(ISocket.UPDATE, ISocket.TASK, task_id);
 
   });
-
-  // Prevent the edit dialog from displaying.
-  event.stopPropagation();
 
 }
 
