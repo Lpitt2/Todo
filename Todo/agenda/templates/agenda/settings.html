@@ -14,8 +14,6 @@
     <div class="layout-center-body">
       <h1 class="center">Settings</h1>
 
-      <p></p>
-
       <hr/>
 
       <h3>Account</h3>
@@ -57,24 +55,17 @@
               <tr>
                 <td>Description</td>
                 <td>
-                  <input type="checkbox">
+                  <input class="appearence-option" value="description" type="checkbox" {% if display_description %}checked{% endif %}>
                 </td>
               </tr>
               <tr>
                 <td>Due Date</td>
                 <td>
-                  <input type="checkbox">
+                  <input class="appearence-option" value="due-date" type="checkbox" {% if display_due_date %}checked{% endif %}>
                 </td>
               </tr>
             </tbody>
           </table>
-        </div>
-
-        <div>
-          <select id="view-selector">
-            <option {% if settings.view == 1 %}selected{% endif %}>Default</option>
-            <option {% if settings.view == 2 %}selected{% endif %}>Compact</option>
-          </select>
         </div>
 
       </p>
@@ -87,7 +78,7 @@
 
         <table class="hidden data-table">
           <tbody>
-            {% for setting in settings %}
+            {% for setting in alert_settings %}
 
             <tr>
 

@@ -13,9 +13,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Set the event handlers for the elements.
   delete_button.addEventListener("click", handle_account_delete);
+  document.querySelectorAll(".appearence-option").forEach(option => {
+    option.addEventListener("click", handle_view_option_change);
+  });
   document.querySelectorAll(".common-board-alert-setting-options").forEach(option => {
     option.addEventListener("click", handle_alert_option_change);
   });
+
 
 });
 
@@ -56,5 +60,24 @@ function handle_alert_option_change(event) {
       status: status
     })
   });
+
+}
+
+function handle_view_option_change(event) {
+
+  //Get the value and selection status.
+  const option_button = event.target;
+  const option_value = option_button.value;
+  const selected = option_button.checked;
+
+  // Send the updated information to the server.
+  fetch("http://localhost:8000/settings/views", {
+    method: "PUT",
+    body: JSON.stringify({
+      type: option_value,
+      status: selected
+    })
+  })
+  .catch(e => { alert("Unexpected failular to update settings."); });
 
 }

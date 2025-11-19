@@ -223,16 +223,22 @@ def settings_view(request):
   """Displays the user's settings page."""
 
   # Attempt to get the common board settings.
-  settings = []
+  display_description = False
+  display_due_date = False
+  alert_settings = []
   try:
 
-    settings = [ { "id": setting.id, "title": setting.board.title, "show_alerts": setting.show_alerts } for setting in CommonBoardSetting.objects.filter(user=request.user) ]
+    alert_settings = [ { "id": setting.id, "title": setting.board.title, "show_alerts": setting.show_alerts } for setting in CommonBoardSetting.objects.filter(user=request.user) ]
+    
+    view_settings = ViewSetting.objects.get(user=request.user)
+    display_description = view_settings.display_description
+    display_due_date = view_settings.display_due_date
 
   except:
 
     pass
 
-  return render(request, "agenda/settings.html", {'common_boards': [board for board in request.user.commonboard_set.all()], 'settings': settings})
+  return render(request, "agenda/settings.html", {'common_boards': [board for board in request.user.commonboard_set.all()], 'alert_settings': alert_settings, "display_description": display_description, "display_due_date": display_due_date})
 
 
 
@@ -283,6 +289,42 @@ def settings_update_alerts(request):
   return HttpResponse(status=200)
 
 
+@login_required(login_url="/login")
+@require_http_methods(["PUT"])
+@csrf_exempt
+def settings_view_update(request):
+  """Updates the viewing settings."""
+  
+  # Convert the body to a dictionary.
+  data = JSONDecoder().decode(request.body.decode("utf-8"))
+
+  # Attempt to get the settings object for the user.
+  settings = None
+  try:
+
+    settings = ViewSetting.objects.get(user=request.user)
+
+  except:
+
+    settings = ViewSetting()
+    settings.user = request.user
+
+  # Ensure that the required fields are present.
+  if ("type" not in data or "status" not in data):
+    return HttpResponse(status=400)
+
+  # Update the appropriate attributes.
+  if (data['type'] == 'description'):
+    settings.display_description = data['status']
+  elif (data['type'] == 'due-date'):
+    settings.display_due_date = data['status']
+
+  # Save the settings object.
+  settings.save()
+
+  return HttpResponse(status=200)
+
+
 
 
 
@@ -290,6 +332,7 @@ def settings_update_alerts(request):
 
 @login_required(login_url="/login")
 def alert_task_info(request):
+
   """Returns the user's task alerts."""
 
   # Declare local variables.

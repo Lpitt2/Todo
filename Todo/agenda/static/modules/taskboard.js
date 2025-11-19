@@ -3,11 +3,9 @@
 
   Content:
    - Taskboard:             Manages the groups and task blocks.
+   - TaskBlock:             Represents a task within a taskboard.
    - style_task_block:      Applys conditional styling to a task block given the completion status and due-date.
 */
-
-const _view_description = await cookieStore.get({name: "view-description"}).value;
-const _view_due_date = await cookieStore.get({name: "view-due-date"}).value;
 
 // Manages the groups and task blocks.
 export class Taskboard {
@@ -237,6 +235,7 @@ export class Taskboard {
 
 
 
+// Represents a task within a taskboard.
 class TaskBlock {
 
   #task;
@@ -311,33 +310,44 @@ class TaskBlock {
     header_box.append(delete_container);
     this.#source.append(header_box);
 
-    // Create the description if necessary.
-    if (_view_description === "true") {
+    cookieStore.get({name: "view-description"}).then(response => {
+    
+      // Create the description if necessary.
+      if (response.value === "True") {
 
-      // Create the description block.
-      this.#description = document.createElement("div");
+        // Create the description block.
+        this.#description = document.createElement("div");
 
-      // Set the content of the description block.
-      this.#description.textContent = this.#task.description;
+        // Set the content of the description block.
+        this.#description.textContent = this.#task.description;
 
-      // Append the description block to the task block.
-      this.#source.append(this.#description);
+        // Append the description block to the task block.
+        this.#source.append(this.#description);
 
-    }
+      }
+    
+    });
 
-    // Create the due date if necessary.
-    if (_view_due_date === "true") {
+    cookieStore.get({name: "view-due-date"}).then(response => {
 
-      // Create the due date block.
-      this.#due_date = document.createElement("div");
+      // Create the due date if necessary.
+      if (response.value === "True") {
 
-      // Set the content of the due date block.
-      this.#due_date = `Due-Date: ${this.#task.getMonth()}/${this.#task.getDate()}/${this.#task.due_date.getFullYear()}`;
+        // Create the due date block.
+        this.#due_date = document.createElement("div");
 
-      // Append the due date block to the task block.
-      this.#source.append(this.#due_date);
+        // Get the date object.
+        const date = this.#task.due_date;
 
-    }
+        // Set the content of the due date block.
+        this.#due_date = `Due-Date: ${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
+
+        // Append the due date block to the task block.
+        this.#source.append(this.#due_date);
+
+      }
+
+    });
  
     // Set up the delete icon information.
     delete_icon.src = "/static/icons/delete.svg";
@@ -391,7 +401,6 @@ class TaskBlock {
   }
 
 };
-
 
 
 

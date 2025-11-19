@@ -34,16 +34,9 @@ class CommonBoard(models.Model):
 
 
 class ViewSetting(models.Model):
-  
-  # Viewing Choices.
-  viewing_choices = {
-    1: "DEFAULT",
-    2: "COMPACT"
-  }
 
   # Fields.
   user = models.ForeignKey(User, on_delete=models.CASCADE)
-  view = models.IntegerField("view", choices=viewing_choices, default=1)
   display_description = models.BooleanField("description", default=False)
   display_due_date = models.BooleanField("due_date", default=False)
 
